@@ -114,6 +114,13 @@
       "agentId": "sm",
       "outputFile": "",
       "completedAt": "2026-03-20T11:24:28.884Z"
+    },
+    {
+      "id": "code-review",
+      "agentId": "dev",
+      "agentName": "Amelia",
+      "outputFile": "",
+      "completedAt": "2026-03-20T11:40:00.000Z"
     }
   ]
 }

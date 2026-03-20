@@ -5,6 +5,7 @@ import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { createDatabaseManager } from '../../src/db/database.js';
+import { createStubLogger } from '../helpers.js';
 
 const tempPaths = new Set<string>();
 
@@ -13,13 +14,6 @@ const createTempDir = () => {
   tempPaths.add(dir);
   return dir;
 };
-
-const createStubLogger = () => ({
-  info: () => undefined,
-  debug: () => undefined,
-  warn: () => undefined,
-  error: () => undefined,
-});
 
 afterEach(() => {
   for (const target of tempPaths) {
@@ -109,6 +103,24 @@ describe('createDatabaseManager', () => {
       'tag_id',
     ]);
     expect(settingsColumns.map((column: { name: string }) => column.name)).toEqual(['key', 'value']);
+
+    manager.close();
+  });
+
+  it('uses the default migrations directory when one is not provided', () => {
+    const dataDir = createTempDir();
+    const manager = createDatabaseManager({
+      dataDir,
+      logger: createStubLogger(),
+    });
+
+    manager.initialize();
+
+    const settingsTable = manager.db.prepare(
+      "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
+    ).get('settings');
+
+    expect(settingsTable).toEqual({ name: 'settings' });
 
     manager.close();
   });

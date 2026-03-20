@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import Database from 'better-sqlite3';
 import type pino from 'pino';
@@ -8,7 +9,7 @@ import { config } from '../config.js';
 import { logger } from '../middleware/logger-middleware.js';
 
 const DEFAULT_DATABASE_FILE = 'bookmarks.db';
-const DEFAULT_MIGRATIONS_DIR = path.resolve(path.dirname(new URL(import.meta.url).pathname), 'migrations');
+const DEFAULT_MIGRATIONS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'migrations');
 
 type MigrationRecord = {
   name: string;

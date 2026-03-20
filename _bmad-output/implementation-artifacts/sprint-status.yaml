@@ -33,7 +33,7 @@ development_status:
   # Epic 4: Data Import & Export
   epic-4: in-progress
   4-1-import-netscape-html-bookmarks: ready-for-dev
-  4-2-export-bookmarks-as-json: backlog
+  4-2-export-bookmarks-as-json: ready-for-dev
 
   # Epic 5: Production Deployment
   epic-5: backlog

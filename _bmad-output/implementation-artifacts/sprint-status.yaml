@@ -15,7 +15,7 @@ development_status:
   1-2-database-setup-and-migration-system: done
   1-3-api-key-authentication: done
   1-4-health-check-endpoint: done
-  1-5-error-handling-and-input-validation-framework: backlog
+  1-5-error-handling-and-input-validation-framework: ready-for-dev
 
   # Epic 2: Bookmark Management
   epic-2: backlog

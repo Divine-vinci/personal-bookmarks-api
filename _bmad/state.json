@@ -121,6 +121,12 @@
       "agentName": "Amelia",
       "outputFile": "",
       "completedAt": "2026-03-20T11:40:00.000Z"
+    },
+    {
+      "id": "create-story",
+      "agentId": "sm",
+      "outputFile": "",
+      "completedAt": "2026-03-20T11:54:18.811Z"
     }
   ]
 }

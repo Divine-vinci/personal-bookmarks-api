@@ -5,15 +5,15 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 1.3 API Key Authentication (code-review running)
+- Current story: Story 1.3 API Key Authentication (code-review timed out)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: Story 1.3 implemented, verified (`npm test`, `npm run build`), committed/pushed as `466cdc7`, and `code-review` started via ACP session `agent:claude:acp:e64e8f9c-e5ca-4c34-9254-a0faa92594dd`.
-- Next step: Poll ACP session agent:claude:acp:e64e8f9c-e5ca-4c34-9254-a0faa92594dd for `code-review` completion, then commit review fixes if any and mark Story 1.3 done.
+- Last action: ACP poll found no transcript output for `code-review` session `agent:claude:acp:e64e8f9c-e5ca-4c34-9254-a0faa92594dd` after >30 minutes; marked timed out and queued GPT-5.4 fallback.
+- Next step: Fallback: start GPT-5.4 for code-review on Story 1.3 API Key Authentication.
 
 ## Active Code Review Session
 - acp_session_key: agent:claude:acp:e64e8f9c-e5ca-4c34-9254-a0faa92594dd
 - acp_workflow: code-review
-- acp_status: running
+- acp_status: timed_out
 - acp_started_at: 2026-03-20T09:07:00Z
 
 ## Previous Create Story Session

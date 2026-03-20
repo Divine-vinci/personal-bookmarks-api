@@ -5,17 +5,17 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 2.1 Create Bookmark (code-review complete); Story 2.2 Get and List Bookmarks (create-story running)
+- Current story: Story 2.2 Get and List Bookmarks (dev-story running); Story 2.3 Update Bookmark (create-story running)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll detected completed code-review output for Story 2.1 and spawned create-story ACP session `agent:claude:acp:ff19bcee-b936-48cb-8005-08fba3d76305` for Story 2.2.
-- Next step: ACP session running — poll cron active
-- next_after_acp: Start story 2.2: Get and List Bookmarks — dev+prep parallel
+- Last action: ACP poll detected completed create-story output for Story 2.2, then spawned dev-story subagent `agent:main:subagent:75fddbfa-9c37-40cd-bcb6-09f7ba0f7c9a` for Story 2.2 and create-story ACP session `agent:claude:acp:697d797a-9932-41c1-85f4-2b3c54a755bc` for Story 2.3.
+- Next step: Pipeline State active — poll cron handling
+- next_after_acp: Run code-review for story 2.2
 
 ## Active Create Story Session
-- acp_session_key: agent:claude:acp:ff19bcee-b936-48cb-8005-08fba3d76305
+- acp_session_key: agent:claude:acp:697d797a-9932-41c1-85f4-2b3c54a755bc
 - acp_workflow: create-story
 - acp_status: running
-- acp_started_at: 2026-03-20T13:46:17Z
+- acp_started_at: 2026-03-20T13:55:26Z
 
 ## Previous Create Story Session
 - acp_session_key: agent:claude:acp:b545526a-0a4d-4f57-936d-26ea1d50b55b
@@ -23,12 +23,18 @@
 - acp_status: completed (detected by ACP poll on 2026-03-20; pipeline already advanced to dev-story)
 - acp_started_at: 2026-03-20T12:27:00Z
 
+## Previous Create Story Session
+- acp_session_key: agent:claude:acp:ff19bcee-b936-48cb-8005-08fba3d76305
+- acp_workflow: create-story
+- acp_status: completed (detected by ACP poll on 2026-03-20)
+- acp_started_at: 2026-03-20T13:45:17Z
+
 
 ## Active Dev Session
-- subagent_session_key: agent:main:subagent:9446eae2-0f1b-446b-8163-feab633a428d
+- subagent_session_key: agent:main:subagent:75fddbfa-9c37-40cd-bcb6-09f7ba0f7c9a
 - subagent_workflow: dev-story
-- subagent_status: completed (detected by heartbeat from finished transcript; recovery commit: 514f110)
-- subagent_started_at: 2026-03-20T12:31:00Z
+- subagent_status: running
+- subagent_started_at: 2026-03-20T13:55:26Z
 
 ## Previous Code Review Session
 - acp_session_key: agent:claude:acp:7249ea0a-c525-40bf-9ac9-deab0a199048
@@ -65,14 +71,18 @@
 - subagent_workflow: dev-story-fallback
 - subagent_status: completed
 
+## Pipeline State
+- current_dev_story: 2.2 Get and List Bookmarks — GPT-5.4 session: agent:main:subagent:75fddbfa-9c37-40cd-bcb6-09f7ba0f7c9a
+- current_prep_story: 2.3 Update Bookmark — Claude ACP session: agent:claude:acp:697d797a-9932-41c1-85f4-2b3c54a755bc
+
 ## Stories (populated after sprint-planning from sprint-status.yaml)
 - [x] Story 1.1: Initialize Project and Development Environment (commit: 3a09389)
 - [x] Story 1.2: Database Setup and Migration System (commit: be853ae)
 - [x] Story 1.3: API Key Authentication (commit: af1c267)
 - [x] Story 1.4: Health Check Endpoint (commit: ff1d3a6)
 - [x] Story 1.5: Error Handling and Input Validation Framework (commit: cc441d3)
-- [x] Story 2.1: Create Bookmark (commit: pending ACP poll commit)
-- [ ] Story 2.2: Get and List Bookmarks
+- [x] Story 2.1: Create Bookmark (commit: 4cc2bde)
+- [ ] Story 2.2: Get and List Bookmarks (in progress via dev-story)
 - [ ] Story 2.3: Update Bookmark
 - [ ] Story 2.4: Delete Bookmark
 - [ ] Story 3.1: Full-Text Search with FTS5
@@ -123,7 +133,8 @@
 - [x] create-story — Story 2.1
 - [x] dev-story — Story 2.1
 - [x] code-review — Story 2.1
-- [x] Story 2.1 loop complete (commit: pending ACP poll commit)
+- [x] Story 2.1 loop complete (commit: 4cc2bde)
+- [x] create-story — Story 2.2
 
 ## Blockers
 - None

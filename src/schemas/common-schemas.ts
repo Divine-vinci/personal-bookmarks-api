@@ -11,7 +11,8 @@ export const paginationSchema = z.object({
     const parsed = value
       .split(',')
       .map((tag) => tag.trim().toLowerCase())
-      .filter(Boolean);
+      .filter(Boolean)
+      .slice(0, 20);
 
     return parsed.length > 0 ? parsed : undefined;
   }),

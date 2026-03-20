@@ -1,6 +1,6 @@
 # Story 3.2: Tag Filtering
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -22,37 +22,37 @@ So that I can browse my bookmarks by topic or category.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Add `tags` query parameter to pagination schema (AC: #1, #2, #4)
-  - [ ] Add optional `tags` field to `paginationSchema` in `src/schemas/common-schemas.ts`
-  - [ ] `tags` should be a comma-separated string that is parsed into an array of lowercase-trimmed tag names
-  - [ ] Empty string or missing param results in no tag filtering
+- [x] Task 1: Add `tags` query parameter to pagination schema (AC: #1, #2, #4)
+  - [x]Add optional `tags` field to `paginationSchema` in `src/schemas/common-schemas.ts`
+  - [x]`tags` should be a comma-separated string that is parsed into an array of lowercase-trimmed tag names
+  - [x]Empty string or missing param results in no tag filtering
 
-- [ ] Task 2: Add tag filtering logic to `listBookmarks` in bookmark repository (AC: #1, #2, #4, #5)
-  - [ ] Modify `listBookmarks` options type to accept optional `tags` parameter
-  - [ ] When `tags` is provided (non-empty array), filter bookmarks using AND semantics via `bookmark_tags`/`tags` junction join
-  - [ ] AND semantics: a bookmark must have ALL specified tags (use HAVING COUNT = tag count pattern)
-  - [ ] Ensure pagination (limit/offset) and sorting work with filtered results
-  - [ ] Return correct `total` count for filtered results
-  - [ ] When `tags` is NOT provided, keep existing behavior unchanged
+- [x] Task 2: Add tag filtering logic to `listBookmarks` in bookmark repository (AC: #1, #2, #4, #5)
+  - [x]Modify `listBookmarks` options type to accept optional `tags` parameter
+  - [x]When `tags` is provided (non-empty array), filter bookmarks using AND semantics via `bookmark_tags`/`tags` junction join
+  - [x]AND semantics: a bookmark must have ALL specified tags (use HAVING COUNT = tag count pattern)
+  - [x]Ensure pagination (limit/offset) and sorting work with filtered results
+  - [x]Return correct `total` count for filtered results
+  - [x]When `tags` is NOT provided, keep existing behavior unchanged
 
-- [ ] Task 3: Add combined search + tag filtering to `searchBookmarks` (AC: #3)
-  - [ ] When both `q` and `tags` are provided, apply FTS5 search AND tag filtering together
-  - [ ] Results must match the search query AND have all specified tags
-  - [ ] Relevance ranking from FTS5 is preserved when combining with tag filter
+- [x] Task 3: Add combined search + tag filtering to `searchBookmarks` (AC: #3)
+  - [x]When both `q` and `tags` are provided, apply FTS5 search AND tag filtering together
+  - [x]Results must match the search query AND have all specified tags
+  - [x]Relevance ranking from FTS5 is preserved when combining with tag filter
 
-- [ ] Task 4: Wire `tags` parameter through route handler (AC: #1)
-  - [ ] Verify the existing `GET /` handler in `src/routes/bookmark-routes.ts` passes `tags` to `listBookmarks` (should flow through automatically via `paginationSchema`)
+- [x] Task 4: Wire `tags` parameter through route handler (AC: #1)
+  - [x]Verify the existing `GET /` handler in `src/routes/bookmark-routes.ts` passes `tags` to `listBookmarks` (should flow through automatically via `paginationSchema`)
 
-- [ ] Task 5: Write tests (AC: #1-#5)
-  - [ ] Filter bookmarks by a single tag returns only matching bookmarks
-  - [ ] Filter bookmarks by multiple tags uses AND semantics (only bookmarks with ALL tags)
-  - [ ] Filter with a non-existent tag returns `{ data: [], total: 0 }`
-  - [ ] Tag filtering respects pagination parameters (limit, offset)
-  - [ ] Tag filtering respects sort parameter
-  - [ ] Tag filtering combined with full-text search (`q` + `tags`)
-  - [ ] Tag filtering with empty tags param returns all bookmarks (no filter)
-  - [ ] Tag names are case-insensitive (tags are stored lowercase)
-  - [ ] All existing tests must still pass
+- [x] Task 5: Write tests (AC: #1-#5)
+  - [x]Filter bookmarks by a single tag returns only matching bookmarks
+  - [x]Filter bookmarks by multiple tags uses AND semantics (only bookmarks with ALL tags)
+  - [x]Filter with a non-existent tag returns `{ data: [], total: 0 }`
+  - [x]Tag filtering respects pagination parameters (limit, offset)
+  - [x]Tag filtering respects sort parameter
+  - [x]Tag filtering combined with full-text search (`q` + `tags`)
+  - [x]Tag filtering with empty tags param returns all bookmarks (no filter)
+  - [x]Tag names are case-insensitive (tags are stored lowercase)
+  - [x]All existing tests must still pass
 
 ## Dev Notes
 

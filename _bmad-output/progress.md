@@ -5,10 +5,10 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 2.1 Create Bookmark (create-story running)
+- Current story: Story 2.1 Create Bookmark (dev-story running)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll completed `code-review` for Story 1.5, committed/pushed `cc441d3`, started `create-story` for Story 2.1 via ACP session `agent:claude:acp:b545526a-0a4d-4f57-936d-26ea1d50b55b`.
-- Next step: Poll ACP session agent:claude:acp:b545526a-0a4d-4f57-936d-26ea1d50b55b for `create-story` completion.
+- Last action: Polled ACP `create-story` for Story 2.1 to completion, committed/pushed BMAD artifacts as `4b3b367`, completed `create-story`, and spawned `dev-story` subagent `agent:main:subagent:9446eae2-0f1b-446b-8163-feab633a428d`.
+- Next step: Wait for subagent agent:main:subagent:9446eae2-0f1b-446b-8163-feab633a428d to finish `dev-story` for Story 2.1, then run `code-review`.
 
 ## Active Create Story Session
 - acp_session_key: agent:claude:acp:3cd8759c-1ddd-4d15-9ed6-1b2dc3138134
@@ -16,11 +16,18 @@
 - acp_status: completed
 - acp_started_at: 2026-03-20T11:44:00Z
 
-## Active Create Story Session
+## Previous Create Story Session
 - acp_session_key: agent:claude:acp:b545526a-0a4d-4f57-936d-26ea1d50b55b
 - acp_workflow: create-story
-- acp_status: running
+- acp_status: completed (detected by ACP poll on 2026-03-20; pipeline already advanced to dev-story)
 - acp_started_at: 2026-03-20T12:27:00Z
+
+
+## Active Dev Session
+- subagent_session_key: agent:main:subagent:9446eae2-0f1b-446b-8163-feab633a428d
+- subagent_workflow: dev-story
+- subagent_status: running
+- subagent_started_at: 2026-03-20T12:31:00Z
 
 ## Previous Code Review Session
 - acp_session_key: agent:claude:acp:bfe68edb-312d-4450-b61a-a129368033f4

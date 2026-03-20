@@ -188,6 +188,12 @@
       "agentId": "dev",
       "outputFile": "",
       "completedAt": "2026-03-20T14:44:18.253Z"
+    },
+    {
+      "id": "create-story",
+      "agentId": "sm",
+      "outputFile": "",
+      "completedAt": "2026-03-20T14:47:15.987Z"
     }
   ]
 }

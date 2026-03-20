@@ -5,15 +5,15 @@
   "currentPhase": "implementation",
   "activeWorkflows": [
     {
-      "id": "code-review",
-      "agentId": "dev",
-      "agentName": "Amelia",
+      "id": "create-story",
+      "agentId": "sm",
+      "agentName": "Bob",
       "mode": "yolo",
       "currentStep": 1,
       "totalSteps": null,
-      "currentStepFile": "/home/clawd/.openclaw/extensions/bmad-method/bmad-method/bmm/workflows/4-implementation/code-review/workflow.yaml",
+      "currentStepFile": "/home/clawd/.openclaw/extensions/bmad-method/bmad-method/bmm/workflows/4-implementation/create-story/workflow.yaml",
       "outputFile": "",
-      "startedAt": "2026-03-20T06:30:21.392Z"
+      "startedAt": "2026-03-20T07:00:58.493Z"
     }
   ],
   "completedWorkflows": [
@@ -77,6 +77,12 @@
       "agentId": "dev",
       "outputFile": "/home/clawd/projects/personal-bookmarks-api/_bmad-output/implementation-artifacts/dev-story-log.md",
       "completedAt": "2026-03-20T06:04:53.056Z"
+    },
+    {
+      "id": "code-review",
+      "agentId": "dev",
+      "outputFile": "",
+      "completedAt": "2026-03-20T07:00:47.357Z"
     }
   ]
 }

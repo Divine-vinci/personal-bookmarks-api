@@ -5,15 +5,17 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 2.4 Delete Bookmark (dev-story running); Story 3.1 Full-Text Search with FTS5 (create-story running)
+- Current story: Story 2.4 Delete Bookmark (code-review running); Story 3.1 Full-Text Search with FTS5 (ready-for-dev)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: Heartbeat recovery committed pending BMAD artifacts and is starting a synchronous GPT-5.4 fallback for Story 2.4 dev-story after the prior session timed out with no transcript output.
-- Next step: Fallback in progress — wait for Story 2.4 dev-story completion, then run code-review and resume Story 3.1 parallel track
+- Last action: ACP poll committed Story 2.4 dev implementation (b5c5f39) and spawned code-review ACP session `agent:claude:acp:775e0092-0d1a-40a5-94c0-9def61448bbe`; Story 3.1 create-story artifact is ready for the next parallel track.
+- Next step: ACP session running — poll cron active
 - next_after_acp: Start story 3.1: Full-Text Search with FTS5 — dev+prep parallel
 
-## Pipeline State
-- current_dev_story: 2.4 — GPT-5.4 session: agent:main:subagent:01e154a7-e8ef-4991-b418-500deca4e073 (timed_out: no transcript output after >30 minutes)
-- current_prep_story: 3.1 — Claude ACP session: agent:claude:acp:c91b6d19-2f93-49bf-82c8-c6ccd7f4049e (completed)
+## ACP Session
+- acp_session_key: agent:claude:acp:775e0092-0d1a-40a5-94c0-9def61448bbe
+- acp_workflow: code-review
+- acp_status: running
+- acp_started_at: 2026-03-20T15:36:00Z
 
 ## Previous Create Story Session
 - acp_session_key: agent:claude:acp:e416cb9e-870f-4732-ab85-5ed597d2d6f4
@@ -95,7 +97,7 @@
 - [x] Story 2.1: Create Bookmark (commit: 0b6aab1)
 - [x] Story 2.2: Get and List Bookmarks (commit: 92ab074)
 - [ ] Story 2.3: Update Bookmark (in code-review)
-- [ ] Story 2.4: Delete Bookmark
+- [ ] Story 2.4: Delete Bookmark (in code-review)
 - [ ] Story 3.1: Full-Text Search with FTS5
 - [ ] Story 3.2: Tag Filtering
 - [ ] Story 3.3: Tag Listing and Cleanup
@@ -149,6 +151,13 @@
 - [x] dev-story — Story 2.2
 - [x] code-review — Story 2.2 (commit: 92ab074)
 - [x] Story 2.2 loop complete (commit: 92ab074)
+- [x] create-story — Story 2.3
+- [x] dev-story — Story 2.3
+- [x] code-review — Story 2.3 (commit: 9a44ba9)
+- [x] Story 2.3 loop complete (commit: 9a44ba9)
+- [x] create-story — Story 2.4
+- [x] dev-story — Story 2.4 (commit: b5c5f39)
+- [x] create-story — Story 3.1
 - [x] create-story — Story 2.3
 - [x] dev-story — Story 2.3
 

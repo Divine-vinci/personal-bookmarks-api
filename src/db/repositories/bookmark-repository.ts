@@ -21,6 +21,14 @@ type SqliteConstraintError = Error & {
   code?: string;
 };
 
+type ListBookmarksOptions = {
+  limit: number;
+  offset: number;
+  sort?: 'created_at' | 'updated_at' | 'title' | undefined;
+  q?: string | undefined;
+  tags?: string[] | undefined;
+};
+
 const isDuplicateUrlError = (error: unknown): error is SqliteConstraintError => {
   if (!(error instanceof Error)) {
     return false;
@@ -70,6 +78,17 @@ const getTagsByBookmarkId = (db: SqliteDatabase, bookmarkIds: number[]): Map<num
   return tagsByBookmarkId;
 };
 
+const getBookmarksWithTags = (db: SqliteDatabase, rows: BookmarkRow[]): PaginatedResponse<Bookmark>['data'] => {
+  if (rows.length === 0) {
+    return [];
+  }
+
+  const bookmarkIds = rows.map((row) => row.id);
+  const tagsByBookmarkId = getTagsByBookmarkId(db, bookmarkIds);
+
+  return rows.map((row) => mapBookmarkRow(row, tagsByBookmarkId.get(row.id) ?? []));
+};
+
 export const getBookmarkById = (id: number): Bookmark => {
   const db = getDatabase();
   const bookmarkRow = db.prepare(
@@ -105,11 +124,61 @@ const buildFtsQuery = (query: string): string => query
   .map((term) => `"${term.replaceAll('"', '""')}"*`)
   .join(' ');
 
+const buildTagMatchCte = (tags: string[]) => {
+  const placeholders = tags.map(() => '?').join(', ');
+
+  return `filtered_bookmarks AS (
+    SELECT bt.bookmark_id
+    FROM bookmark_tags bt
+    INNER JOIN tags t ON t.id = bt.tag_id
+    WHERE t.name IN (${placeholders})
+    GROUP BY bt.bookmark_id
+    HAVING COUNT(DISTINCT t.name) = ?
+  )`;
+};
+
+const filterByTags = (
+  db: SqliteDatabase,
+  options: {
+    tags: string[];
+    limit: number;
+    offset: number;
+    sort?: 'created_at' | 'updated_at' | 'title' | undefined;
+  },
+): PaginatedResponse<Bookmark> => {
+  const orderBy = SORT_CLAUSES[options.sort ?? 'created_at'];
+  const tagCount = options.tags.length;
+  const tagFilterCte = buildTagMatchCte(options.tags);
+
+  const rows = db.prepare(
+    `WITH ${tagFilterCte}
+     SELECT b.id, b.url, b.title, b.description, b.created_at, b.updated_at
+     FROM bookmarks b
+     INNER JOIN filtered_bookmarks fb ON fb.bookmark_id = b.id
+     ORDER BY ${orderBy}
+     LIMIT ? OFFSET ?`,
+  ).all(...options.tags, tagCount, options.limit, options.offset) as BookmarkRow[];
+
+  const total = (
+    db.prepare(
+      `WITH ${tagFilterCte}
+       SELECT COUNT(*) AS count
+       FROM filtered_bookmarks`,
+    ).get(...options.tags, tagCount) as { count: number }
+  ).count;
+
+  return {
+    data: getBookmarksWithTags(db, rows),
+    total,
+  };
+};
+
 const searchBookmarks = (
   db: SqliteDatabase,
   query: string,
   limit: number,
   offset: number,
+  tags?: string[],
 ): PaginatedResponse<Bookmark> => {
   const ftsQuery = buildFtsQuery(query);
   const tagPattern = `%${query.toLowerCase()}%`;
@@ -118,13 +187,20 @@ const searchBookmarks = (
     return { data: [], total: 0 };
   }
 
+  const hasTagFilter = Boolean(tags && tags.length > 0);
+  const tagFilterCte = hasTagFilter ? `${buildTagMatchCte(tags!)},` : '';
+  const tagFilterClause = hasTagFilter ? 'AND b.id IN (SELECT bookmark_id FROM filtered_bookmarks)' : '';
+  const tagFilterParams = hasTagFilter ? [...tags!, tags!.length] : [];
+
   const searchSql = `
-    WITH search_results AS (
+    WITH ${tagFilterCte}
+    search_results AS (
       SELECT b.id, b.url, b.title, b.description, b.created_at, b.updated_at,
              bm25(bookmarks_fts) AS rank
       FROM bookmarks_fts
       JOIN bookmarks b ON b.id = bookmarks_fts.rowid
       WHERE bookmarks_fts MATCH ?
+        ${tagFilterClause}
 
       UNION
 
@@ -134,6 +210,7 @@ const searchBookmarks = (
       JOIN bookmark_tags bt ON bt.bookmark_id = b.id
       JOIN tags t ON t.id = bt.tag_id
       WHERE lower(t.name) LIKE ?
+        ${tagFilterClause}
         AND b.id NOT IN (
           SELECT bookmarks_fts.rowid FROM bookmarks_fts WHERE bookmarks_fts MATCH ?
         )
@@ -145,12 +222,13 @@ const searchBookmarks = (
   `;
 
   const countSql = `
-    SELECT COUNT(*) AS count
-    FROM (
+    WITH ${tagFilterCte}
+    matches AS (
       SELECT b.id
       FROM bookmarks_fts
       JOIN bookmarks b ON b.id = bookmarks_fts.rowid
       WHERE bookmarks_fts MATCH ?
+        ${tagFilterClause}
 
       UNION
 
@@ -159,40 +237,42 @@ const searchBookmarks = (
       JOIN bookmark_tags bt ON bt.bookmark_id = b.id
       JOIN tags t ON t.id = bt.tag_id
       WHERE lower(t.name) LIKE ?
-    ) matches
+        ${tagFilterClause}
+    )
+    SELECT COUNT(*) AS count
+    FROM matches
   `;
 
   let rows: Array<BookmarkRow & { rank: number }>;
   let total: number;
 
   try {
-    rows = db.prepare(searchSql).all(ftsQuery, tagPattern, ftsQuery, limit, offset) as Array<BookmarkRow & { rank: number }>;
-    total = (db.prepare(countSql).get(ftsQuery, tagPattern) as { count: number }).count;
+    rows = db.prepare(searchSql).all(...tagFilterParams, ftsQuery, tagPattern, ftsQuery, limit, offset) as Array<BookmarkRow & { rank: number }>;
+    total = (db.prepare(countSql).get(...tagFilterParams, ftsQuery, tagPattern) as { count: number }).count;
   } catch {
     return { data: [], total: 0 };
   }
 
-  if (rows.length === 0) {
-    return { data: [], total };
-  }
-
-  const bookmarkIds = rows.map((row) => row.id);
-  const tagsByBookmarkId = getTagsByBookmarkId(db, bookmarkIds);
-  const bookmarks = rows.map((row) => mapBookmarkRow(row, tagsByBookmarkId.get(row.id) ?? []));
-
-  return { data: bookmarks, total };
+  return {
+    data: getBookmarksWithTags(db, rows),
+    total,
+  };
 };
 
-export const listBookmarks = (options: {
-  limit: number;
-  offset: number;
-  sort?: 'created_at' | 'updated_at' | 'title' | undefined;
-  q?: string | undefined;
-}): PaginatedResponse<Bookmark> => {
+export const listBookmarks = (options: ListBookmarksOptions): PaginatedResponse<Bookmark> => {
   const db = getDatabase();
 
   if (options.q) {
-    return searchBookmarks(db, options.q, options.limit, options.offset);
+    return searchBookmarks(db, options.q, options.limit, options.offset, options.tags);
+  }
+
+  if (options.tags && options.tags.length > 0) {
+    return filterByTags(db, {
+      tags: options.tags,
+      limit: options.limit,
+      offset: options.offset,
+      sort: options.sort,
+    });
   }
 
   const orderBy = SORT_CLAUSES[options.sort ?? 'created_at'];
@@ -206,18 +286,10 @@ export const listBookmarks = (options: {
 
   const total = (db.prepare('SELECT COUNT(*) as count FROM bookmarks').get() as { count: number }).count;
 
-  if (rows.length === 0) {
-    return { data: [], total };
-  }
-
-  const bookmarkIds = rows.map((row) => row.id);
-  const tagsByBookmarkId = getTagsByBookmarkId(db, bookmarkIds);
-  const bookmarks = rows.map((row) => mapBookmarkRow(
-    row,
-    tagsByBookmarkId.get(row.id) ?? [],
-  ));
-
-  return { data: bookmarks, total };
+  return {
+    data: getBookmarksWithTags(db, rows),
+    total,
+  };
 };
 
 export const createBookmark = (input: CreateBookmarkInput): Bookmark => {

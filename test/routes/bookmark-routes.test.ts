@@ -1265,6 +1265,199 @@ describe('bookmark routes', () => {
     });
   });
 
+  it('filters bookmarks by a single tag', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/tag-filter-rust',
+      title: 'Rust guide',
+      description: 'Systems programming',
+      tags: ['rust'],
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/tag-filter-python',
+      title: 'Python guide',
+      description: 'Scripting language',
+      tags: ['python'],
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?tags=rust');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string; tags: string[] }>; total: number };
+    expect(body.total).toBe(1);
+    expect(body.data).toHaveLength(1);
+    expect(body.data[0]?.title).toBe('Rust guide');
+    expect(body.data[0]?.tags).toEqual(['rust']);
+  });
+
+  it('filters bookmarks by multiple tags with AND semantics', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/rust-async',
+      title: 'Rust async patterns',
+      description: 'Combined tags',
+      tags: ['rust', 'async'],
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/rust-only',
+      title: 'Rust only',
+      description: 'Missing async tag',
+      tags: ['rust'],
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/async-only',
+      title: 'Async only',
+      description: 'Missing rust tag',
+      tags: ['async'],
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?tags=rust,async');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }>; total: number };
+    expect(body.total).toBe(1);
+    expect(body.data.map((bookmark) => bookmark.title)).toEqual(['Rust async patterns']);
+  });
+
+  it('returns empty results for non-existent tag filters', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/existing-tag',
+      title: 'Existing bookmark',
+      description: 'Stored bookmark',
+      tags: ['rust'],
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?tags=nonexistent');
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      data: [],
+      total: 0,
+    });
+  });
+
+  it('applies pagination to tag-filtered results', async () => {
+    const app = createApp();
+
+    for (let index = 0; index < 5; index += 1) {
+      await authorizedJsonRequest(app, {
+        url: `https://example.com/paginated-tag-${index}`,
+        title: `Rust pagination ${index}`,
+        description: 'Pagination test',
+        tags: ['rust'],
+      });
+    }
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?tags=rust&limit=2&offset=1&sort=title');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }>; total: number };
+    expect(body.total).toBe(5);
+    expect(body.data).toHaveLength(2);
+    expect(body.data.map((bookmark) => bookmark.title)).toEqual(['Rust pagination 1', 'Rust pagination 2']);
+  });
+
+  it('applies sorting to tag-filtered results', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/tag-sort-zeta',
+      title: 'Zeta note',
+      description: 'Sort test',
+      tags: ['rust'],
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/tag-sort-alpha',
+      title: 'Alpha note',
+      description: 'Sort test',
+      tags: ['rust'],
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?tags=rust&sort=title');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }>; total: number };
+    expect(body.total).toBe(2);
+    expect(body.data.map((bookmark) => bookmark.title)).toEqual(['Alpha note', 'Zeta note']);
+  });
+
+  it('combines full-text search and tag filtering', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/performance-rust',
+      title: 'Rust performance tuning',
+      description: 'Optimize throughput',
+      tags: ['rust', 'performance'],
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/performance-python',
+      title: 'Python performance tuning',
+      description: 'Optimize throughput',
+      tags: ['python', 'performance'],
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/rust-unrelated',
+      title: 'Rust ownership guide',
+      description: 'Borrow checker refresher',
+      tags: ['rust'],
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?q=performance&tags=rust');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string; tags: string[] }>; total: number };
+    expect(body.total).toBe(1);
+    expect(body.data[0]?.title).toBe('Rust performance tuning');
+    expect(body.data[0]?.tags).toEqual(['performance', 'rust']);
+  });
+
+  it('treats empty tags query params as no filter', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/no-filter-a',
+      title: 'First bookmark',
+      description: 'No filter applied',
+      tags: ['rust'],
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/no-filter-b',
+      title: 'Second bookmark',
+      description: 'No filter applied',
+      tags: ['python'],
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?tags=%20,%20');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }>; total: number };
+    expect(body.total).toBe(2);
+    expect(body.data).toHaveLength(2);
+  });
+
+  it('treats tag filters as case-insensitive', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/case-insensitive-tag',
+      title: 'Case insensitive tag match',
+      description: 'Stored in lowercase',
+      tags: ['rust'],
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?tags=RUST');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }>; total: number };
+    expect(body.total).toBe(1);
+    expect(body.data[0]?.title).toBe('Case insensitive tag match');
+  });
+
   it('creates the FTS5 virtual table and sync triggers in the database', () => {
     const db = getDatabase();
 

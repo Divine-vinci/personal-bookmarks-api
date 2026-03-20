@@ -5,6 +5,16 @@ export const paginationSchema = z.object({
   offset: z.coerce.number().int().min(0, 'Offset must be at least 0').default(0),
   sort: z.enum(['created_at', 'updated_at', 'title']).optional(),
   q: z.string().trim().min(1).optional(),
+  tags: z.string().optional().transform((value) => {
+    if (!value) return undefined;
+
+    const parsed = value
+      .split(',')
+      .map((tag) => tag.trim().toLowerCase())
+      .filter(Boolean);
+
+    return parsed.length > 0 ? parsed : undefined;
+  }),
 });
 
 export const idParamSchema = z.object({

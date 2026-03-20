@@ -46,6 +46,17 @@ describe('common schemas', () => {
     expect(result.success).toBe(false);
   });
 
+  it('parses comma-separated tags into lowercase trimmed arrays', () => {
+    const result = paginationSchema.parse({ tags: ' Rust, Async ,,web ' });
+
+    expect(result.tags).toEqual(['rust', 'async', 'web']);
+  });
+
+  it('treats empty tags input as undefined', () => {
+    expect(paginationSchema.parse({ tags: '' }).tags).toBeUndefined();
+    expect(paginationSchema.parse({ tags: ' , , ' }).tags).toBeUndefined();
+  });
+
   it('accepts all valid sort values', () => {
     expect(paginationSchema.safeParse({ sort: 'created_at' }).success).toBe(true);
     expect(paginationSchema.safeParse({ sort: 'updated_at' }).success).toBe(true);

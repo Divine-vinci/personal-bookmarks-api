@@ -1,26 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { DatabaseManager } from '../../src/db/database.js';
-import { createDatabaseManager, setDatabaseManager } from '../../src/db/database.js';
+import { setDatabaseManager } from '../../src/db/database.js';
 import { getApiKeyHash, setApiKeyHash } from '../../src/db/repositories/settings-repository.js';
-
-const createStubLogger = () => ({
-  info: () => undefined,
-  debug: () => undefined,
-  warn: () => undefined,
-  error: () => undefined,
-});
-
-const createInMemoryManager = (): DatabaseManager => {
-  const manager = createDatabaseManager({
-    databaseFileName: ':memory:',
-    migrationsDir: new URL('../../src/db/migrations', import.meta.url).pathname,
-    logger: createStubLogger(),
-  });
-
-  manager.initialize();
-  return manager;
-};
+import { createInMemoryManager } from '../helpers.js';
 
 describe('settings repository', () => {
   let manager: DatabaseManager;

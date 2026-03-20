@@ -21,7 +21,7 @@ export const ensureApiKeyConfigured = (): void => {
   const apiKeyHash = createHash('sha256').update(apiKey).digest('hex');
 
   setApiKeyHash(apiKeyHash);
-  logger.info({ event: 'api_key_generated', apiKey }, 'Generated initial API key');
+  logger.info({ event: 'api_key_generated' }, `Generated initial API key: ${apiKey}`);
 };
 
 export const startServer = () => {

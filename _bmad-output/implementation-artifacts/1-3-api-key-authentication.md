@@ -1,6 +1,6 @@
 # Story 1.3: API Key Authentication
 
-Status: review
+Status: done
 
 ## Story
 
@@ -238,3 +238,47 @@ openai/gpt-5.4
 - Validation completed with `npm test` and `npm run build`.
 
 ### File List
+
+- `src/db/repositories/settings-repository.ts` — Created: API key hash get/set repository
+- `src/middleware/auth-middleware.ts` — Created: Bearer token auth middleware with health bypass
+- `src/routes/auth-routes.ts` — Created: POST /api/auth/regenerate endpoint
+- `src/routes/health-routes.ts` — Created: GET /api/health endpoint
+- `src/app.ts` — Modified: wired auth middleware + health/auth routes
+- `src/index.ts` — Modified: added ensureApiKeyConfigured() first-run logic
+- `src/db/database.ts` — Modified: added setDatabaseManager() for test isolation
+- `test/helpers.ts` — Created: shared test utilities (createStubLogger, createInMemoryManager)
+- `test/db/settings-repository.test.ts` — Created: settings repository unit tests
+- `test/middleware/auth-middleware.test.ts` — Created: auth middleware tests
+- `test/routes/auth-routes.test.ts` — Created: regenerate endpoint integration tests
+- `test/routes/health-routes.test.ts` — Created: health endpoint tests
+- `test/index.test.ts` — Created: ensureApiKeyConfigured unit tests
+
+### Senior Developer Review (AI)
+
+**Reviewer:** Amelia (claude-opus-4-6)
+**Date:** 2026-03-20
+
+**Issues Found:** 1 High, 3 Medium, 1 Low
+**Issues Fixed:** 4 (1 High, 3 Medium)
+
+| # | Severity | Issue | Fix |
+|---|---|---|---|
+| 1 | HIGH | API key logged as structured JSON field in `src/index.ts:24` — plaintext key indexed by log aggregation | Moved key to message text, removed from structured fields |
+| 2 | MEDIUM | Dev Agent Record File List empty — no documentation of created/modified files | Populated File List with all 13 files |
+| 3 | MEDIUM | `createStubLogger()`/`createInMemoryManager()` duplicated across 4 test files | Extracted to shared `test/helpers.ts` |
+| 4 | MEDIUM | Auth middleware warn logs leaking into test output | Added `vi.mock()` for logger in auth-middleware tests |
+| 5 | LOW | No test for non-Bearer auth scheme (`Authorization: Basic xyz`) | Not fixed — code handles correctly, low risk |
+
+**Acceptance Criteria Validation:**
+- AC1: IMPLEMENTED — key generation, hash storage, one-time log display ✓
+- AC2: IMPLEMENTED — valid Bearer token authentication ✓
+- AC3: IMPLEMENTED — 401 for missing header with correct error format ✓
+- AC4: IMPLEMENTED — 401 for invalid key with same generic error ✓
+- AC5: IMPLEMENTED — POST /api/auth/regenerate returns new key, invalidates old ✓
+- AC6: IMPLEMENTED — /api/health bypasses auth middleware ✓
+
+**Verdict:** APPROVED — all ACs implemented, all HIGH/MEDIUM issues fixed
+
+### Change Log
+
+- 2026-03-20: Code review by Amelia — fixed 4 issues, approved, status → done

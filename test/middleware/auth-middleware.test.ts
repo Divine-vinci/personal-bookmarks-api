@@ -1,30 +1,22 @@
 import { createHash } from 'node:crypto';
 
 import { Hono } from 'hono';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { DatabaseManager } from '../../src/db/database.js';
-import { createDatabaseManager, setDatabaseManager } from '../../src/db/database.js';
+import { setDatabaseManager } from '../../src/db/database.js';
 import { setApiKeyHash } from '../../src/db/repositories/settings-repository.js';
 import { authMiddleware } from '../../src/middleware/auth-middleware.js';
+import { createInMemoryManager } from '../helpers.js';
 
-const createStubLogger = () => ({
-  info: () => undefined,
-  debug: () => undefined,
-  warn: () => undefined,
-  error: () => undefined,
-});
-
-const createInMemoryManager = (): DatabaseManager => {
-  const manager = createDatabaseManager({
-    databaseFileName: ':memory:',
-    migrationsDir: new URL('../../src/db/migrations', import.meta.url).pathname,
-    logger: createStubLogger(),
-  });
-
-  manager.initialize();
-  return manager;
-};
+vi.mock('../../src/middleware/logger-middleware.js', () => ({
+  logger: {
+    info: () => undefined,
+    debug: () => undefined,
+    warn: () => undefined,
+    error: () => undefined,
+  },
+}));
 
 const createTestApp = () => {
   const app = new Hono();

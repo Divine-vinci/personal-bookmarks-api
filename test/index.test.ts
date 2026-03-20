@@ -1,28 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { DatabaseManager } from '../src/db/database.js';
-import { createDatabaseManager, setDatabaseManager } from '../src/db/database.js';
+import { setDatabaseManager } from '../src/db/database.js';
 import { getApiKeyHash } from '../src/db/repositories/settings-repository.js';
 import { ensureApiKeyConfigured } from '../src/index.js';
 import { logger } from '../src/middleware/logger-middleware.js';
-
-const createStubLogger = () => ({
-  info: () => undefined,
-  debug: () => undefined,
-  warn: () => undefined,
-  error: () => undefined,
-});
-
-const createInMemoryManager = (): DatabaseManager => {
-  const manager = createDatabaseManager({
-    databaseFileName: ':memory:',
-    migrationsDir: new URL('../src/db/migrations', import.meta.url).pathname,
-    logger: createStubLogger(),
-  });
-
-  manager.initialize();
-  return manager;
-};
+import { createInMemoryManager } from './helpers.js';
 
 describe('ensureApiKeyConfigured', () => {
   let manager: DatabaseManager;
@@ -47,11 +30,8 @@ describe('ensureApiKeyConfigured', () => {
 
     expect(storedHash).toMatch(/^[a-f0-9]{64}$/);
     expect(infoSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        event: 'api_key_generated',
-        apiKey: expect.stringMatching(/^[a-f0-9]{64}$/),
-      }),
-      'Generated initial API key',
+      { event: 'api_key_generated' },
+      expect.stringMatching(/^Generated initial API key: [a-f0-9]{64}$/),
     );
   });
 

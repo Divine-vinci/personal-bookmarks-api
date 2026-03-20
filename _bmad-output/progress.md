@@ -7,14 +7,14 @@
 - Phase: 4
 - Current story: Story 4.1 Import Netscape HTML Bookmarks (code-review running); Story 4.2 Export Bookmarks as JSON (ready-for-dev)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll confirmed Story 4.1 dev (`d145be8`) and Story 4.2 create-story completion, then committed/pushed the parallel close (`2c37ac1`) and spawned code-review for Story 4.1.
-- Next step: ACP session running — poll cron active
+- Last action: ACP poll found Story 4.1 code-review ACP session `agent:claude:acp:75136ba5-09be-406d-8d9e-69c76d2c1207` still had no transcript after >30 minutes, so it was marked timed_out for fallback recovery.
+- Next step: Fallback: start GPT-5.4 for code-review
 - next_after_acp: Start story 4.2: Export Bookmarks as JSON — dev+prep parallel
 
 ## ACP Session
 - acp_session_key: agent:claude:acp:75136ba5-09be-406d-8d9e-69c76d2c1207
 - acp_workflow: code-review
-- acp_status: running
+- acp_status: timed_out
 - acp_started_at: 2026-03-20T16:57:00Z
 
 ## Previous Dev Session

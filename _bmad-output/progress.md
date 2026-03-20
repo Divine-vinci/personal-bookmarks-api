@@ -5,17 +5,15 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 3.1 Full-Text Search with FTS5 (code-review running); Story 3.2 Tag Filtering (ready-for-dev)
+- Current story: Story 3.2 Tag Filtering (dev running); Story 3.3 Tag Listing and Cleanup (create-story running)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll confirmed Story 3.1 dev (`94c8dbb`) and Story 3.2 create-story completion, then committed/pushed the parallel close (`0444a4d`) and spawned code-review for Story 3.1.
+- Last action: ACP poll confirmed Story 3.1 code-review passed cleanly and advanced the pipeline by starting Story 3.2 dev plus Story 3.3 create-story in parallel.
 - Next step: ACP session running — poll cron active
-- next_after_acp: Start story 3.2: Tag Filtering — dev+prep parallel
+- next_after_acp: Run code-review for story 3.2
 
-## ACP Session
-- acp_session_key: agent:claude:acp:36c7b565-217b-4600-ba46-f310145e2739
-- acp_workflow: code-review
-- acp_status: running
-- acp_started_at: 2026-03-20T15:57:00Z
+## Pipeline State
+- current_dev_story: 3.2 Tag Filtering — GPT-5.4 session: agent:main:subagent:8b1befcf-5b8d-4046-b6e7-785edace8896
+- current_prep_story: 3.3 Tag Listing and Cleanup — Claude ACP session: agent:claude:acp:822b5984-c88c-455c-8744-7c66fa6e61c3
 
 ## Previous Create Story Session
 - acp_session_key: agent:claude:acp:e416cb9e-870f-4732-ab85-5ed597d2d6f4
@@ -98,9 +96,9 @@
 - [x] Story 2.2: Get and List Bookmarks (commit: 92ab074)
 - [ ] Story 2.3: Update Bookmark (in code-review)
 - [ ] Story 2.4: Delete Bookmark (in code-review)
-- [ ] Story 3.1: Full-Text Search with FTS5 (in code-review)
-- [ ] Story 3.2: Tag Filtering (ready-for-dev)
-- [ ] Story 3.3: Tag Listing and Cleanup
+- [x] Story 3.1: Full-Text Search with FTS5 (commit: 94c8dbb)
+- [ ] Story 3.2: Tag Filtering (dev running)
+- [ ] Story 3.3: Tag Listing and Cleanup (create-story running)
 - [ ] Story 4.1: Import Netscape HTML Bookmarks
 - [ ] Story 4.2: Export Bookmarks as JSON
 - [ ] Story 5.1: Docker Containerization
@@ -160,6 +158,7 @@
 - [x] create-story — Story 3.1
 - [x] dev-story — Story 3.1 (commit: 94c8dbb)
 - [x] create-story — Story 3.2 (commit: 0444a4d)
+- [x] code-review — Story 3.1 (commit: 0444a4d)
 - [x] create-story — Story 2.3
 - [x] dev-story — Story 2.3
 

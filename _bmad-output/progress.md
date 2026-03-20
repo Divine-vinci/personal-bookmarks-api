@@ -5,15 +5,17 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 4.2 Export Bookmarks as JSON (dev running); Story 5.1 Docker Containerization (create-story running)
+- Current story: Story 4.2 Export Bookmarks as JSON (code-review running); Story 5.1 Docker Containerization (ready-for-dev)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: Heartbeat fallback completed Story 4.1 code review with fix commit `a5d592d`; ACP poll pushed it and advanced the pipeline by starting Story 4.2 dev plus Story 5.1 create-story in parallel.
-- Next step: Pipeline State active — poll cron handling
-- next_after_acp: Run code-review for story 4.2
+- Last action: ACP poll confirmed Story 4.2 dev (`fecd258`) and Story 5.1 create-story completion, then committed/pushed the parallel close (`0580e06`) and spawned code-review for Story 4.2.
+- Next step: ACP session running — poll cron active
+- next_after_acp: Start story 5.1: Docker Containerization — sequential
 
-## Pipeline State
-- current_dev_story: 4.2 Export Bookmarks as JSON — GPT-5.4 session: agent:main:subagent:4c0bacde-0f0e-446d-8f6f-45b566514b37
-- current_prep_story: 5.1 Docker Containerization — Claude ACP session: agent:claude:acp:2489ba8b-4551-4640-b387-af7c419e0ffe
+## ACP Session
+- acp_session_key: agent:claude:acp:a2cf7eb2-401a-4057-b86d-43942eb2eea3
+- acp_workflow: code-review
+- acp_status: running
+- acp_started_at: 2026-03-20T18:17:00Z
 
 ## Previous Dev Session
 - subagent_session_key: agent:main:subagent:349ac109-6f32-4df5-8e63-b1c2ea6466e6
@@ -106,8 +108,8 @@
 - [x] Story 3.2: Tag Filtering (commit: 079bd72 + review fix 9daf1b1)
 - [x] Story 3.3: Tag Listing and Cleanup (commit: bab03ad)
 - [x] Story 4.1: Import Netscape HTML Bookmarks (commit: d145be8 + review fix a5d592d)
-- [ ] Story 4.2: Export Bookmarks as JSON (dev running)
-- [ ] Story 5.1: Docker Containerization (create-story running)
+- [ ] Story 4.2: Export Bookmarks as JSON (in code-review)
+- [ ] Story 5.1: Docker Containerization (ready-for-dev)
 
 ## Completed Workflows
 - [x] create-product-brief
@@ -174,6 +176,8 @@
 - [x] dev-story — Story 4.1 (commit: d145be8)
 - [x] create-story — Story 4.2 (commit: 2c37ac1)
 - [x] code-review — Story 4.1 (commit: a5d592d)
+- [x] dev-story — Story 4.2 (commit: fecd258)
+- [x] create-story — Story 5.1 (commit: 0580e06)
 - [x] dev-story — Story 3.2 (commit: 079bd72)
 - [x] create-story — Story 3.3 (commit: 2c6cc69)
 - [x] dev-story — Story 3.3 (commit: bab03ad)
@@ -182,6 +186,8 @@
 - [x] dev-story — Story 4.1 (commit: d145be8)
 - [x] create-story — Story 4.2 (commit: 2c37ac1)
 - [x] code-review — Story 4.1 (commit: a5d592d)
+- [x] dev-story — Story 4.2 (commit: fecd258)
+- [x] create-story — Story 5.1 (commit: 0580e06)
 - [x] create-story — Story 2.3
 - [x] dev-story — Story 2.3
 

@@ -1,0 +1,40 @@
+# Sprint Status — personal-bookmarks-api
+# Generated: 2026-03-20
+#
+# STATUS DEFINITIONS:
+#   backlog        — Story not yet prepared for development
+#   ready-for-dev  — Story context file created, ready for dev-story workflow
+#   in-progress    — Developer agent is actively implementing
+#   review         — Code complete, awaiting code review
+#   done           — Story fully implemented, reviewed, and merged
+
+development_status:
+  # Epic 1: Project Foundation & Authentication
+  epic-1: in-progress
+  1-1-initialize-project-and-development-environment: ready-for-dev
+  1-2-database-setup-and-migration-system: backlog
+  1-3-api-key-authentication: backlog
+  1-4-health-check-endpoint: backlog
+  1-5-error-handling-and-input-validation-framework: backlog
+
+  # Epic 2: Bookmark Management
+  epic-2: backlog
+  2-1-create-bookmark: backlog
+  2-2-get-and-list-bookmarks: backlog
+  2-3-update-bookmark: backlog
+  2-4-delete-bookmark: backlog
+
+  # Epic 3: Search, Filtering & Tag Management
+  epic-3: backlog
+  3-1-full-text-search-with-fts5: backlog
+  3-2-tag-filtering: backlog
+  3-3-tag-listing-and-cleanup: backlog
+
+  # Epic 4: Data Import & Export
+  epic-4: backlog
+  4-1-import-netscape-html-bookmarks: backlog
+  4-2-export-bookmarks-as-json: backlog
+
+  # Epic 5: Production Deployment
+  epic-5: backlog
+  5-1-docker-containerization: backlog

@@ -1,6 +1,6 @@
 # Story 2.2: Get and List Bookmarks
 
-Status: review
+Status: done
 
 ## Story
 
@@ -277,12 +277,30 @@ GPT-5.4
 
 ### File List
 
-- `src/db/repositories/bookmark-repository.ts` — added `listBookmarks()` for paginated bookmark retrieval with per-bookmark tag loading.
+- `src/db/repositories/bookmark-repository.ts` — added `listBookmarks()` for paginated bookmark retrieval with batch tag loading.
 - `src/routes/bookmark-routes.ts` — added authenticated `GET /` and `GET /:id` handlers.
 - `src/schemas/common-schemas.ts` — capped `limit` to 100 via schema transform.
-- `test/routes/bookmark-routes.test.ts` — added GET route coverage for AC #1-#7.
+- `test/routes/bookmark-routes.test.ts` — added GET route coverage for AC #1-#7, boundary validation tests.
 - `test/schemas/common-schemas.test.ts` — updated limit-cap schema coverage.
+
+## Senior Developer Review (AI)
+
+**Reviewer:** User on 2026-03-20
+**Outcome:** Approved with fixes applied
+
+### Issues Found & Fixed
+- **H1 (Fixed):** N+1 tag query in `listBookmarks` replaced with batch `IN()` query — reduced from N+1 to 3 queries per request.
+- **H2 (Fixed):** SQL string interpolation replaced with `SORT_CLAUSES` whitelist map — eliminates architecture anti-pattern violation.
+- **M1 (Fixed):** Slow limit-cap test (105 sequential POST requests) replaced with direct DB inserts.
+- **M2 (Fixed):** Added boundary validation tests for `limit=0` and `offset=-1`.
+- **M3 (Resolved):** Prepared statement recreation eliminated by H1 batch fix.
+- **L1 (Deferred):** Missing Content-Type assertions in GET tests.
+- **L2 (Deferred):** Redundant `as ZodError` casts in bookmark-routes.ts.
+
+### Test Results
+93/93 tests passing (91 previous + 2 new boundary tests).
 
 ## Change Log
 
 - 2026-03-20 — Implemented Story 2.2 GET/list bookmark retrieval, pagination capping, and regression coverage; story moved to review.
+- 2026-03-20 — Code review: Fixed N+1 query, SQL interpolation anti-pattern, slow test, added boundary tests; story moved to done.

@@ -170,6 +170,12 @@
       "agentId": "sm",
       "outputFile": "",
       "completedAt": "2026-03-20T14:14:14.047Z"
+    },
+    {
+      "id": "code-review",
+      "agentId": "dev",
+      "outputFile": "",
+      "completedAt": "2026-03-20T14:24:57.677Z"
     }
   ]
 }

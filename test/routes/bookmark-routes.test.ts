@@ -445,12 +445,14 @@ describe('bookmark routes', () => {
 
   it('caps limit values above 100 at 100', async () => {
     const app = createApp();
+    const db = getDatabase();
+    const now = '2026-03-20T12:00:00.000Z';
+    const insert = db.prepare(
+      'INSERT INTO bookmarks (url, title, description, created_at, updated_at) VALUES (?, ?, NULL, ?, ?)',
+    );
 
     for (let index = 0; index < 105; index += 1) {
-      await authorizedJsonRequest(app, {
-        url: `https://example.com/capped-limit-${index}`,
-        title: `Cap ${index.toString().padStart(3, '0')}`,
-      });
+      insert.run(`https://example.com/capped-limit-${index}`, `Cap ${index.toString().padStart(3, '0')}`, now, now);
     }
 
     const response = await authorizedGetRequest(app, '/api/bookmarks?limit=999');
@@ -587,5 +589,27 @@ describe('bookmark routes', () => {
       data: [],
       total: 0,
     });
+  });
+
+  it('returns 422 for limit=0', async () => {
+    const app = createApp();
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?limit=0');
+
+    expect(response.status).toBe(422);
+    const body = await response.json() as { error: { code: string; details: Array<{ field: string }> } };
+    expect(body.error.code).toBe('validation_error');
+    expect(body.error.details.some((detail) => detail.field === 'limit')).toBe(true);
+  });
+
+  it('returns 422 for negative offset', async () => {
+    const app = createApp();
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?offset=-1');
+
+    expect(response.status).toBe(422);
+    const body = await response.json() as { error: { code: string; details: Array<{ field: string }> } };
+    expect(body.error.code).toBe('validation_error');
+    expect(body.error.details.some((detail) => detail.field === 'offset')).toBe(true);
   });
 });

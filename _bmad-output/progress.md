@@ -5,16 +5,22 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 2.2 Get and List Bookmarks (dev-story running); Story 2.3 Update Bookmark (create-story running)
+- Current story: Story 2.2 Get and List Bookmarks (code-review running); Story 2.3 Update Bookmark (ready for dev)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll detected completed create-story output for Story 2.2, then spawned dev-story subagent `agent:main:subagent:75fddbfa-9c37-40cd-bcb6-09f7ba0f7c9a` for Story 2.2 and create-story ACP session `agent:claude:acp:697d797a-9932-41c1-85f4-2b3c54a755bc` for Story 2.3.
-- Next step: Pipeline State active — poll cron handling
-- next_after_acp: Run code-review for story 2.2
+- Last action: ACP poll detected both completed tracks for Story 2.2 dev and Story 2.3 prep, committed/pushed changes as `d2db0b9`, and spawned code-review ACP session `agent:claude:acp:f17cd8ad-11b7-4f92-ba18-6bc9afd9a180` for Story 2.2.
+- Next step: Poll ACP session agent:claude:acp:f17cd8ad-11b7-4f92-ba18-6bc9afd9a180 for code-review completion
+- next_after_acp: Start story 2.3: Update Bookmark — dev+prep parallel
 
-## Active Create Story Session
+## Active Code Review Session
+- acp_session_key: agent:claude:acp:f17cd8ad-11b7-4f92-ba18-6bc9afd9a180
+- acp_workflow: code-review
+- acp_status: running
+- acp_started_at: 2026-03-20T14:14:00Z
+
+## Previous Create Story Session
 - acp_session_key: agent:claude:acp:697d797a-9932-41c1-85f4-2b3c54a755bc
 - acp_workflow: create-story
-- acp_status: running
+- acp_status: completed (paired with Story 2.2 dev completion during ACP poll on 2026-03-20)
 - acp_started_at: 2026-03-20T13:55:26Z
 
 ## Previous Create Story Session
@@ -29,11 +35,10 @@
 - acp_status: completed (detected by ACP poll on 2026-03-20)
 - acp_started_at: 2026-03-20T13:45:17Z
 
-
-## Active Dev Session
+## Previous Dev Session
 - subagent_session_key: agent:main:subagent:75fddbfa-9c37-40cd-bcb6-09f7ba0f7c9a
 - subagent_workflow: dev-story
-- subagent_status: running
+- subagent_status: completed
 - subagent_started_at: 2026-03-20T13:55:26Z
 
 ## Previous Code Review Session
@@ -70,10 +75,6 @@
 - subagent_session_key: agent:main:subagent:bde27395-24a7-4d22-8439-8113e6c36922
 - subagent_workflow: dev-story-fallback
 - subagent_status: completed
-
-## Pipeline State
-- current_dev_story: 2.2 Get and List Bookmarks — GPT-5.4 session: agent:main:subagent:75fddbfa-9c37-40cd-bcb6-09f7ba0f7c9a
-- current_prep_story: 2.3 Update Bookmark — Claude ACP session: agent:claude:acp:697d797a-9932-41c1-85f4-2b3c54a755bc
 
 ## Stories (populated after sprint-planning from sprint-status.yaml)
 - [x] Story 1.1: Initialize Project and Development Environment (commit: 3a09389)

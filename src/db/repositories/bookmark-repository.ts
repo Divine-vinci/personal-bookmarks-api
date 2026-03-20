@@ -66,35 +66,56 @@ export const getBookmarkById = (id: number): Bookmark => {
   return mapBookmarkRow(bookmarkRow, tagRows.map((tag) => tag.name));
 };
 
+const SORT_CLAUSES: Record<string, string> = {
+  created_at: 'created_at DESC',
+  updated_at: 'updated_at DESC',
+  title: 'title ASC',
+};
+
 export const listBookmarks = (options: {
   limit: number;
   offset: number;
   sort?: 'created_at' | 'updated_at' | 'title' | undefined;
 }): PaginatedResponse<Bookmark> => {
   const db = getDatabase();
-  const sortColumn = options.sort ?? 'created_at';
-  const sortDirection = sortColumn === 'title' ? 'ASC' : 'DESC';
+  const orderBy = SORT_CLAUSES[options.sort ?? 'created_at'];
 
   const rows = db.prepare(
     `SELECT id, url, title, description, created_at, updated_at
      FROM bookmarks
-     ORDER BY ${sortColumn} ${sortDirection}
+     ORDER BY ${orderBy}
      LIMIT ? OFFSET ?`,
   ).all(options.limit, options.offset) as BookmarkRow[];
 
   const total = (db.prepare('SELECT COUNT(*) as count FROM bookmarks').get() as { count: number }).count;
 
-  const selectTagsByBookmarkId = db.prepare(
-    `SELECT t.name
+  if (rows.length === 0) {
+    return { data: [], total };
+  }
+
+  const placeholders = rows.map(() => '?').join(', ');
+  const bookmarkIds = rows.map((row) => row.id);
+  const tagRows = db.prepare(
+    `SELECT bt.bookmark_id, t.name
      FROM tags t
      INNER JOIN bookmark_tags bt ON bt.tag_id = t.id
-     WHERE bt.bookmark_id = ?
+     WHERE bt.bookmark_id IN (${placeholders})
      ORDER BY t.name ASC`,
-  );
+  ).all(...bookmarkIds) as Array<{ bookmark_id: number; name: string }>;
+
+  const tagsByBookmarkId = new Map<number, string[]>();
+  for (const tag of tagRows) {
+    const tags = tagsByBookmarkId.get(tag.bookmark_id);
+    if (tags) {
+      tags.push(tag.name);
+    } else {
+      tagsByBookmarkId.set(tag.bookmark_id, [tag.name]);
+    }
+  }
 
   const bookmarks = rows.map((row) => mapBookmarkRow(
     row,
-    (selectTagsByBookmarkId.all(row.id) as Array<Pick<TagRow, 'name'>>).map((tag) => tag.name),
+    tagsByBookmarkId.get(row.id) ?? [],
   ));
 
   return { data: bookmarks, total };

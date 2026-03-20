@@ -1,6 +1,6 @@
 # Story 1.2: Database Setup and Migration System
 
-Status: review
+Status: done
 
 ## Story
 
@@ -260,6 +260,25 @@ openai/gpt-5.4
 - src/types.ts
 - test/db/database.test.ts
 
+### Senior Developer Review (AI)
+
+**Reviewer:** Amelia (claude-opus-4-6) — 2026-03-20
+
+**Issues Found:** 1 Critical, 2 High, 1 Medium, 1 Low — all fixed.
+
+1. **[CRITICAL][FIXED]** Module-level eager DB connection at `database.ts:109` — `createDatabaseManager()` executed at import time, before `fs.mkdirSync` in `index.ts` could create the data directory. On first run with no `./data/` directory, the app would crash. **Fix:** Lazy-init singleton via `getDefaultManager()`.
+
+2. **[HIGH][FIXED]** Redundant `createMigrationsTable(db)` call in `initialize()` — already called inside `runMigrations()`. **Fix:** Removed duplicate call from `initialize()`.
+
+3. **[HIGH][FIXED]** Removed unused `runMigrations` module-level export (only `initDatabase` and `getDatabase` needed).
+
+4. **[MEDIUM][FIXED]** `localeCompare` for migration file sorting is locale-dependent — could produce incorrect ordering on non-English locales. **Fix:** Replaced with `Array.sort()` (lexicographic, locale-independent).
+
+5. **[LOW][FIXED]** `MigrationRecord` type and SELECT query included unused `id`/`applied_at` fields. **Fix:** Trimmed type and query to `name` only.
+
+**Verdict:** All ACs validated as implemented. All tasks verified as complete. All issues fixed. Build passes, 17/17 tests pass.
+
 ### Change Log
 
 - 2026-03-20 — Implemented SQLite bootstrap + migration system, wired startup initialization, fixed shared API types, and added database-layer regression tests.
+- 2026-03-20 — [Code Review] Fixed 5 issues: lazy-init singleton, redundant migrations table creation, locale-dependent sort, unused type fields, unused export.

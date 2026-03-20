@@ -11,9 +11,7 @@ const DEFAULT_DATABASE_FILE = 'bookmarks.db';
 const DEFAULT_MIGRATIONS_DIR = path.resolve(path.dirname(new URL(import.meta.url).pathname), 'migrations');
 
 type MigrationRecord = {
-  id: number;
   name: string;
-  applied_at: string;
 };
 
 export type DatabaseManagerOptions = {
@@ -58,14 +56,14 @@ export const createDatabaseManager = ({
     const migrationFiles = fs.existsSync(migrationsDir)
       ? fs.readdirSync(migrationsDir)
         .filter((file) => file.endsWith('.sql'))
-        .sort((left, right) => left.localeCompare(right))
+        .sort()
       : [];
 
     const insertMigration = db.prepare(
       'INSERT INTO migrations (name, applied_at) VALUES (?, ?)',
     );
     const selectMigration = db.prepare(
-      'SELECT id, name, applied_at FROM migrations WHERE name = ?',
+      'SELECT name FROM migrations WHERE name = ?',
     );
 
     for (const file of migrationFiles) {
@@ -91,7 +89,6 @@ export const createDatabaseManager = ({
   const initialize = () => {
     db.pragma('journal_mode = WAL');
     db.pragma('foreign_keys = ON');
-    createMigrationsTable(db);
     runMigrations();
 
     return db;
@@ -106,10 +103,15 @@ export const createDatabaseManager = ({
   };
 };
 
-const defaultDatabaseManager = createDatabaseManager();
+let defaultManager: DatabaseManager | null = null;
 
-export const initDatabase = (): SqliteDatabase => defaultDatabaseManager.initialize();
+const getDefaultManager = (): DatabaseManager => {
+  if (!defaultManager) {
+    defaultManager = createDatabaseManager();
+  }
+  return defaultManager;
+};
 
-export const runMigrations = (): void => defaultDatabaseManager.runMigrations();
+export const initDatabase = (): SqliteDatabase => getDefaultManager().initialize();
 
-export const getDatabase = (): SqliteDatabase => defaultDatabaseManager.db;
+export const getDatabase = (): SqliteDatabase => getDefaultManager().db;

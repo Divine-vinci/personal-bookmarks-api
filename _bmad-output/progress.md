@@ -81,7 +81,7 @@
 - [x] Story 1.3: API Key Authentication (commit: af1c267)
 - [x] Story 1.4: Health Check Endpoint (commit: ff1d3a6)
 - [x] Story 1.5: Error Handling and Input Validation Framework (commit: cc441d3)
-- [x] Story 2.1: Create Bookmark (commit: 4cc2bde)
+- [x] Story 2.1: Create Bookmark (commit: 0b6aab1)
 - [ ] Story 2.2: Get and List Bookmarks (in progress via dev-story)
 - [ ] Story 2.3: Update Bookmark
 - [ ] Story 2.4: Delete Bookmark
@@ -133,7 +133,7 @@
 - [x] create-story — Story 2.1
 - [x] dev-story — Story 2.1
 - [x] code-review — Story 2.1
-- [x] Story 2.1 loop complete (commit: 4cc2bde)
+- [x] Story 2.1 loop complete (commit: 0b6aab1)
 - [x] create-story — Story 2.2
 
 ## Blockers

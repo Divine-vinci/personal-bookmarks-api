@@ -79,6 +79,11 @@ describe('createDatabaseManager', () => {
     expect(tableNames.map(({ name }) => name)).toEqual([
       'bookmark_tags',
       'bookmarks',
+      'bookmarks_fts',
+      'bookmarks_fts_config',
+      'bookmarks_fts_data',
+      'bookmarks_fts_docsize',
+      'bookmarks_fts_idx',
       'migrations',
       'settings',
       'tags',
@@ -165,7 +170,10 @@ describe('createDatabaseManager', () => {
       'SELECT name FROM migrations ORDER BY id',
     ).all() as Array<{ name: string }>;
 
-    expect(appliedMigrations).toEqual([{ name: '001-initial-schema' }]);
+    expect(appliedMigrations).toEqual([
+      { name: '001-initial-schema' },
+      { name: '002-fts5-setup' },
+    ]);
 
     manager.close();
   });

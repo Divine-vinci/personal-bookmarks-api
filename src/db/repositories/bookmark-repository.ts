@@ -1,7 +1,7 @@
 import type { CreateBookmarkInput, UpdateBookmarkInput } from '../../schemas/bookmark-schemas.js';
 import type { Bookmark, PaginatedResponse } from '../../types.js';
 import { conflict, notFound } from '../../middleware/error-middleware.js';
-import { getDatabase } from '../database.js';
+import { getDatabase, type SqliteDatabase } from '../database.js';
 
 type BookmarkRow = {
   id: number;
@@ -43,6 +43,33 @@ const mapBookmarkRow = (row: BookmarkRow, tags: string[]): Bookmark => ({
   updated_at: row.updated_at,
 });
 
+const getTagsByBookmarkId = (db: SqliteDatabase, bookmarkIds: number[]): Map<number, string[]> => {
+  if (bookmarkIds.length === 0) {
+    return new Map<number, string[]>();
+  }
+
+  const placeholders = bookmarkIds.map(() => '?').join(', ');
+  const tagRows = db.prepare(
+    `SELECT bt.bookmark_id, t.name
+     FROM tags t
+     INNER JOIN bookmark_tags bt ON bt.tag_id = t.id
+     WHERE bt.bookmark_id IN (${placeholders})
+     ORDER BY t.name ASC`,
+  ).all(...bookmarkIds) as Array<{ bookmark_id: number; name: string }>;
+
+  const tagsByBookmarkId = new Map<number, string[]>();
+  for (const tag of tagRows) {
+    const tags = tagsByBookmarkId.get(tag.bookmark_id);
+    if (tags) {
+      tags.push(tag.name);
+    } else {
+      tagsByBookmarkId.set(tag.bookmark_id, [tag.name]);
+    }
+  }
+
+  return tagsByBookmarkId;
+};
+
 export const getBookmarkById = (id: number): Bookmark => {
   const db = getDatabase();
   const bookmarkRow = db.prepare(
@@ -72,12 +99,102 @@ const SORT_CLAUSES: Record<string, string> = {
   title: 'title ASC',
 };
 
+const buildFtsQuery = (query: string): string => query
+  .split(/\s+/)
+  .filter(Boolean)
+  .map((term) => `"${term.replaceAll('"', '""')}"*`)
+  .join(' ');
+
+const searchBookmarks = (
+  db: SqliteDatabase,
+  query: string,
+  limit: number,
+  offset: number,
+): PaginatedResponse<Bookmark> => {
+  const ftsQuery = buildFtsQuery(query);
+  const tagPattern = `%${query.toLowerCase()}%`;
+
+  if (!ftsQuery) {
+    return { data: [], total: 0 };
+  }
+
+  const searchSql = `
+    WITH search_results AS (
+      SELECT b.id, b.url, b.title, b.description, b.created_at, b.updated_at,
+             bm25(bookmarks_fts) AS rank
+      FROM bookmarks_fts
+      JOIN bookmarks b ON b.id = bookmarks_fts.rowid
+      WHERE bookmarks_fts MATCH ?
+
+      UNION
+
+      SELECT b.id, b.url, b.title, b.description, b.created_at, b.updated_at,
+             0 AS rank
+      FROM bookmarks b
+      JOIN bookmark_tags bt ON bt.bookmark_id = b.id
+      JOIN tags t ON t.id = bt.tag_id
+      WHERE lower(t.name) LIKE ?
+        AND b.id NOT IN (
+          SELECT bookmarks_fts.rowid FROM bookmarks_fts WHERE bookmarks_fts MATCH ?
+        )
+    )
+    SELECT id, url, title, description, created_at, updated_at, rank
+    FROM search_results
+    ORDER BY rank ASC, updated_at DESC, id DESC
+    LIMIT ? OFFSET ?
+  `;
+
+  const countSql = `
+    SELECT COUNT(*) AS count
+    FROM (
+      SELECT b.id
+      FROM bookmarks_fts
+      JOIN bookmarks b ON b.id = bookmarks_fts.rowid
+      WHERE bookmarks_fts MATCH ?
+
+      UNION
+
+      SELECT b.id
+      FROM bookmarks b
+      JOIN bookmark_tags bt ON bt.bookmark_id = b.id
+      JOIN tags t ON t.id = bt.tag_id
+      WHERE lower(t.name) LIKE ?
+    ) matches
+  `;
+
+  let rows: Array<BookmarkRow & { rank: number }>;
+  let total: number;
+
+  try {
+    rows = db.prepare(searchSql).all(ftsQuery, tagPattern, ftsQuery, limit, offset) as Array<BookmarkRow & { rank: number }>;
+    total = (db.prepare(countSql).get(ftsQuery, tagPattern) as { count: number }).count;
+  } catch {
+    return { data: [], total: 0 };
+  }
+
+  if (rows.length === 0) {
+    return { data: [], total };
+  }
+
+  const bookmarkIds = rows.map((row) => row.id);
+  const tagsByBookmarkId = getTagsByBookmarkId(db, bookmarkIds);
+  const bookmarks = rows.map((row) => mapBookmarkRow(row, tagsByBookmarkId.get(row.id) ?? []));
+
+  return { data: bookmarks, total };
+};
+
 export const listBookmarks = (options: {
   limit: number;
   offset: number;
   sort?: 'created_at' | 'updated_at' | 'title' | undefined;
+  q?: string | undefined;
 }): PaginatedResponse<Bookmark> => {
   const db = getDatabase();
+
+  if (options.q) {
+    return searchBookmarks(db, options.q, options.limit, options.offset);
+  }
+
   const orderBy = SORT_CLAUSES[options.sort ?? 'created_at'];
 
   const rows = db.prepare(
@@ -93,26 +210,8 @@ export const listBookmarks = (options: {
     return { data: [], total };
   }
 
-  const placeholders = rows.map(() => '?').join(', ');
   const bookmarkIds = rows.map((row) => row.id);
-  const tagRows = db.prepare(
-    `SELECT bt.bookmark_id, t.name
-     FROM tags t
-     INNER JOIN bookmark_tags bt ON bt.tag_id = t.id
-     WHERE bt.bookmark_id IN (${placeholders})
-     ORDER BY t.name ASC`,
-  ).all(...bookmarkIds) as Array<{ bookmark_id: number; name: string }>;
-
-  const tagsByBookmarkId = new Map<number, string[]>();
-  for (const tag of tagRows) {
-    const tags = tagsByBookmarkId.get(tag.bookmark_id);
-    if (tags) {
-      tags.push(tag.name);
-    } else {
-      tagsByBookmarkId.set(tag.bookmark_id, [tag.name]);
-    }
-  }
-
+  const tagsByBookmarkId = getTagsByBookmarkId(db, bookmarkIds);
   const bookmarks = rows.map((row) => mapBookmarkRow(
     row,
     tagsByBookmarkId.get(row.id) ?? [],

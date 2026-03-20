@@ -1030,4 +1030,250 @@ describe('bookmark routes', () => {
 
     expect(response.status).toBe(401);
   });
+
+  it('searches bookmarks by title via FTS5', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/rust-tokio',
+      title: 'Rust Tokio Cancellation Patterns',
+      description: 'Guide to cooperative cancellation',
+      tags: ['rust'],
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/python',
+      title: 'Python asyncio basics',
+      description: 'Async intro',
+      tags: ['python'],
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?q=tokio%20cancel');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }>; total: number };
+    expect(body.total).toBe(1);
+    expect(body.data.map((bookmark) => bookmark.title)).toEqual(['Rust Tokio Cancellation Patterns']);
+  });
+
+  it('searches bookmarks by url via FTS5', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://tokio.rs/tutorial',
+      title: 'Tokio tutorial',
+      description: 'Runtime docs',
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/other',
+      title: 'Other bookmark',
+      description: 'Other docs',
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?q=tokio');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ url: string }>; total: number };
+    expect(body.total).toBe(1);
+    expect(body.data.map((bookmark) => bookmark.url)).toEqual(['https://tokio.rs/tutorial']);
+  });
+
+  it('searches bookmarks by description via FTS5', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/fts-desc',
+      title: 'SQLite docs',
+      description: 'Detailed FTS5 ranking and bm25 reference',
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?q=ranking');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }>; total: number };
+    expect(body.total).toBe(1);
+    expect(body.data[0]?.title).toBe('SQLite docs');
+  });
+
+  it('searches bookmarks by tag name', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/tagged-rust',
+      title: 'Unrelated title',
+      description: 'No direct term match',
+      tags: ['tokio'],
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/tagged-other',
+      title: 'Different bookmark',
+      description: 'Also no match',
+      tags: ['async'],
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?q=tokio');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string; tags: string[] }>; total: number };
+    expect(body.total).toBe(1);
+    expect(body.data[0]?.title).toBe('Unrelated title');
+    expect(body.data[0]?.tags).toEqual(['tokio']);
+  });
+
+  it('ranks FTS matches ahead of tag-only matches and ignores sort when q is present', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/tag-only-match',
+      title: 'Alpha bookmark',
+      description: 'No full text term here',
+      tags: ['tokio'],
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/fts-best-match',
+      title: 'Tokio cancellation guide',
+      description: 'tokio cancellation tokio',
+      tags: ['rust'],
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/fts-weaker-match',
+      title: 'Tokio notes',
+      description: 'tokio',
+      tags: ['notes'],
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?q=tokio&sort=title');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }>; total: number };
+    expect(body.total).toBe(3);
+    expect(body.data[0]?.title).toBe('Tokio cancellation guide');
+    expect(body.data[body.data.length - 1]?.title).toBe('Alpha bookmark');
+  });
+
+  it('returns empty results when search has no matches', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/existing',
+      title: 'Existing bookmark',
+      description: 'Stored bookmark',
+      tags: ['rust'],
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?q=nonexistent');
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      data: [],
+      total: 0,
+    });
+  });
+
+  it('applies pagination to search results', async () => {
+    const app = createApp();
+
+    for (let index = 0; index < 6; index += 1) {
+      await authorizedJsonRequest(app, {
+        url: `https://example.com/search-page-${index}`,
+        title: `Rust search result ${index}`,
+        description: 'rust rust',
+        tags: ['rust'],
+      });
+    }
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?q=rust&limit=2&offset=2');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }>; total: number };
+    expect(body.total).toBe(6);
+    expect(body.data).toHaveLength(2);
+  });
+
+  it('validates empty trimmed search queries', async () => {
+    const app = createApp();
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?q=%20%20%20');
+
+    expect(response.status).toBe(422);
+    const body = await response.json() as { error: { code: string; details: Array<{ field: string }> } };
+    expect(body.error.code).toBe('validation_error');
+    expect(body.error.details.some((detail) => detail.field === 'q')).toBe(true);
+  });
+
+  it('makes newly created bookmarks searchable via insert trigger', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/newly-searchable',
+      title: 'Fresh FTS entry',
+      description: 'Inserted after migration',
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?q=fresh');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }>; total: number };
+    expect(body.total).toBe(1);
+    expect(body.data[0]?.title).toBe('Fresh FTS entry');
+  });
+
+  it('updates searchable content via update trigger', async () => {
+    const app = createApp();
+
+    const createResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/update-search',
+      title: 'Original search title',
+      description: 'before update',
+      tags: ['rust'],
+    });
+    const created = await createResponse.json() as { id: number };
+
+    await authorizedPutRequest(app, `/api/bookmarks/${created.id}`, {
+      url: 'https://example.com/update-search',
+      title: 'Updated lookup phrase',
+      description: 'after update',
+      tags: ['rust'],
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?q=lookup');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }>; total: number };
+    expect(body.total).toBe(1);
+    expect(body.data[0]?.title).toBe('Updated lookup phrase');
+  });
+
+  it('removes deleted bookmarks from search results via delete trigger', async () => {
+    const app = createApp();
+
+    const createResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/delete-search',
+      title: 'Delete me from search',
+      description: 'should disappear',
+    });
+    const created = await createResponse.json() as { id: number };
+
+    const deleteResponse = await authorizedDeleteRequest(app, `/api/bookmarks/${created.id}`);
+    expect(deleteResponse.status).toBe(204);
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?q=delete');
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      data: [],
+      total: 0,
+    });
+  });
+
+  it('creates the FTS5 virtual table and sync triggers in the database', () => {
+    const db = getDatabase();
+
+    const table = db.prepare("SELECT name, sql FROM sqlite_master WHERE type = 'table' AND name = 'bookmarks_fts'").get() as { name: string; sql: string } | undefined;
+    const triggers = db.prepare("SELECT name FROM sqlite_master WHERE type = 'trigger' AND name IN ('bookmarks_ai', 'bookmarks_ad', 'bookmarks_au') ORDER BY name ASC").all() as Array<{ name: string }>;
+
+    expect(table?.name).toBe('bookmarks_fts');
+    expect(table?.sql).toContain('VIRTUAL TABLE');
+    expect(triggers.map((trigger) => trigger.name)).toEqual(['bookmarks_ad', 'bookmarks_ai', 'bookmarks_au']);
+  });
+
 });

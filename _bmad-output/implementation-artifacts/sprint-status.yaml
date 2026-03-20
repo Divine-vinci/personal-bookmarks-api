@@ -13,7 +13,7 @@ development_status:
   epic-1: in-progress
   1-1-initialize-project-and-development-environment: done
   1-2-database-setup-and-migration-system: done
-  1-3-api-key-authentication: ready-for-dev
+  1-3-api-key-authentication: review
   1-4-health-check-endpoint: backlog
   1-5-error-handling-and-input-validation-framework: backlog
 

@@ -47,7 +47,7 @@ export const createDatabaseManager = ({
   logger: appLogger = logger,
   databaseFileName = DEFAULT_DATABASE_FILE,
 }: DatabaseManagerOptions = {}): DatabaseManager => {
-  const dbPath = path.join(dataDir, databaseFileName);
+  const dbPath = databaseFileName === ':memory:' ? ':memory:' : path.join(dataDir, databaseFileName);
   const db = new Database(dbPath);
 
   const runMigrations = () => {
@@ -104,6 +104,10 @@ export const createDatabaseManager = ({
 };
 
 let defaultManager: DatabaseManager | null = null;
+
+export const setDatabaseManager = (manager: DatabaseManager | null): void => {
+  defaultManager = manager;
+};
 
 const getDefaultManager = (): DatabaseManager => {
   if (!defaultManager) {

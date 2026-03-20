@@ -1,6 +1,6 @@
 # Story 1.3: API Key Authentication
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -24,52 +24,52 @@ So that my bookmark data is protected from unauthorized access.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create `src/db/repositories/settings-repository.ts` (AC: #1, #5)
-  - [ ] `getApiKeyHash(): string | null` — query `settings` table for key `api_key_hash`
-  - [ ] `setApiKeyHash(hash: string): void` — upsert `api_key_hash` in `settings` table
-  - [ ] Use parameterized queries only (NFR9)
-  - [ ] Use `getDatabase()` from `src/db/database.ts` for the db instance
+- [x] Task 1: Create `src/db/repositories/settings-repository.ts` (AC: #1, #5)
+  - [x] `getApiKeyHash(): string | null` — query `settings` table for key `api_key_hash`
+  - [x] `setApiKeyHash(hash: string): void` — upsert `api_key_hash` in `settings` table
+  - [x] Use parameterized queries only (NFR9)
+  - [x] Use `getDatabase()` from `src/db/database.ts` for the db instance
 
-- [ ] Task 2: Create `src/middleware/auth-middleware.ts` (AC: #2, #3, #4, #6)
-  - [ ] Export `authMiddleware()` — Hono MiddlewareHandler
-  - [ ] Skip auth for requests to `/api/health` (check `c.req.path`)
-  - [ ] Extract Bearer token from `Authorization` header
-  - [ ] Hash incoming token with SHA-256, compare against stored hash using `crypto.timingSafeEqual`
-  - [ ] On failure: return 401 with `{ "error": { "code": "unauthorized", "message": "Invalid or missing API key" } }`
-  - [ ] Generic error message for ALL failure cases — missing header, wrong format, invalid key (NFR8)
-  - [ ] Log auth failures at `warn` level (do NOT log the token itself)
+- [x] Task 2: Create `src/middleware/auth-middleware.ts` (AC: #2, #3, #4, #6)
+  - [x] Export `authMiddleware()` — Hono MiddlewareHandler
+  - [x] Skip auth for requests to `/api/health` (check `c.req.path`)
+  - [x] Extract Bearer token from `Authorization` header
+  - [x] Hash incoming token with SHA-256, compare against stored hash using `crypto.timingSafeEqual`
+  - [x] On failure: return 401 with `{ "error": { "code": "unauthorized", "message": "Invalid or missing API key" } }`
+  - [x] Generic error message for ALL failure cases — missing header, wrong format, invalid key (NFR8)
+  - [x] Log auth failures at `warn` level (do NOT log the token itself)
 
-- [ ] Task 3: Create API key generation + first-run logic in `src/index.ts` (AC: #1)
-  - [ ] After `initDatabase()`, check if API key hash exists via settings repository
-  - [ ] If no key exists: generate with `crypto.randomBytes(32).toString('hex')`, hash with SHA-256, store hash, log plaintext key ONCE at `info` level
-  - [ ] If key exists: log `info` message that API key is already configured (do NOT log the key)
-  - [ ] This runs BEFORE server starts listening
+- [x] Task 3: Create API key generation + first-run logic in `src/index.ts` (AC: #1)
+  - [x] After `initDatabase()`, check if API key hash exists via settings repository
+  - [x] If no key exists: generate with `crypto.randomBytes(32).toString('hex')`, hash with SHA-256, store hash, log plaintext key ONCE at `info` level
+  - [x] If key exists: log `info` message that API key is already configured (do NOT log the key)
+  - [x] This runs BEFORE server starts listening
 
-- [ ] Task 4: Create `src/routes/auth-routes.ts` with regenerate endpoint (AC: #5)
-  - [ ] `POST /api/auth/regenerate` — requires valid auth (middleware already applied)
-  - [ ] Generate new key with `crypto.randomBytes(32).toString('hex')`
-  - [ ] Hash new key with SHA-256, store via settings repository
-  - [ ] Return `{ "api_key": "<new-plaintext-key>" }` with 200 status
-  - [ ] Log key regeneration at `info` level (do NOT log the key value)
+- [x] Task 4: Create `src/routes/auth-routes.ts` with regenerate endpoint (AC: #5)
+  - [x] `POST /api/auth/regenerate` — requires valid auth (middleware already applied)
+  - [x] Generate new key with `crypto.randomBytes(32).toString('hex')`
+  - [x] Hash new key with SHA-256, store via settings repository
+  - [x] Return `{ "api_key": "<new-plaintext-key>" }` with 200 status
+  - [x] Log key regeneration at `info` level (do NOT log the key value)
 
-- [ ] Task 5: Create `src/routes/health-routes.ts` (AC: #6)
-  - [ ] `GET /api/health` — returns `{ "status": "ok", "timestamp": "<ISO 8601>" }`
-  - [ ] No authentication required (excluded in auth middleware)
-  - [ ] 200 status code
+- [x] Task 5: Create `src/routes/health-routes.ts` (AC: #6)
+  - [x] `GET /api/health` — returns `{ "status": "ok", "timestamp": "<ISO 8601>" }`
+  - [x] No authentication required (excluded in auth middleware)
+  - [x] 200 status code
 
-- [ ] Task 6: Wire middleware and routes into `src/app.ts` (AC: #2, #6)
-  - [ ] Apply `authMiddleware()` AFTER logger middleware, BEFORE route handlers
-  - [ ] Register health routes at `/api/health`
-  - [ ] Register auth routes at `/api/auth`
-  - [ ] Ensure middleware ordering: logger → auth → routes
+- [x] Task 6: Wire middleware and routes into `src/app.ts` (AC: #2, #6)
+  - [x] Apply `authMiddleware()` AFTER logger middleware, BEFORE route handlers
+  - [x] Register health routes at `/api/health`
+  - [x] Register auth routes at `/api/auth`
+  - [x] Ensure middleware ordering: logger → auth → routes
 
-- [ ] Task 7: Write tests (AC: #1-6)
-  - [ ] `test/db/settings-repository.test.ts` — get/set API key hash with in-memory DB
-  - [ ] `test/middleware/auth-middleware.test.ts` — valid key, missing header, invalid key, health bypass
-  - [ ] `test/routes/auth-routes.test.ts` — regenerate endpoint returns new key, old key invalidated
-  - [ ] `test/routes/health-routes.test.ts` — returns 200 with status/timestamp, no auth required
-  - [ ] Use `app.request()` for integration tests (Hono test helper, no server spin-up)
-  - [ ] Use in-memory SQLite for test isolation
+- [x] Task 7: Write tests (AC: #1-6)
+  - [x] `test/db/settings-repository.test.ts` — get/set API key hash with in-memory DB
+  - [x] `test/middleware/auth-middleware.test.ts` — valid key, missing header, invalid key, health bypass
+  - [x] `test/routes/auth-routes.test.ts` — regenerate endpoint returns new key, old key invalidated
+  - [x] `test/routes/health-routes.test.ts` — returns 200 with status/timestamp, no auth required
+  - [x] Use `app.request()` for integration tests (Hono test helper, no server spin-up)
+  - [x] Use in-memory SQLite for test isolation
 
 ## Dev Notes
 
@@ -227,10 +227,14 @@ export function setApiKeyHash(hash: string): void {
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+openai/gpt-5.4
 
 ### Debug Log References
 
 ### Completion Notes List
+
+- Added API key settings repository, auth middleware, health/auth routes, and startup key provisioning before server listen.
+- Added isolated in-memory SQLite tests covering first-run key generation, auth success/failure cases, health bypass, and regeneration invalidation flow.
+- Validation completed with `npm test` and `npm run build`.
 
 ### File List

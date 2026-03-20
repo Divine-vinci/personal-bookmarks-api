@@ -3,7 +3,10 @@ import { cors } from 'hono/cors';
 
 import type { AppConfig } from './config.js';
 import { config } from './config.js';
+import { authMiddleware } from './middleware/auth-middleware.js';
 import { loggerMiddleware } from './middleware/logger-middleware.js';
+import { createAuthRoutes } from './routes/auth-routes.js';
+import { createHealthRoutes } from './routes/health-routes.js';
 
 export const createApp = (appConfig: AppConfig = config) => {
   const app = new Hono();
@@ -13,10 +16,12 @@ export const createApp = (appConfig: AppConfig = config) => {
   }
 
   app.use('*', loggerMiddleware(appConfig));
+  app.use('*', authMiddleware());
 
-  app.route('/bookmarks', new Hono());
-  app.route('/tags', new Hono());
-  app.route('/auth', new Hono());
+  app.route('/api/health', createHealthRoutes());
+  app.route('/api/auth', createAuthRoutes());
+  app.route('/api/bookmarks', new Hono());
+  app.route('/api/tags', new Hono());
 
   return app;
 };

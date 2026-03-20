@@ -5,17 +5,15 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 4.1 Import Netscape HTML Bookmarks (code-review running); Story 4.2 Export Bookmarks as JSON (ready-for-dev)
+- Current story: Story 4.2 Export Bookmarks as JSON (dev running); Story 5.1 Docker Containerization (create-story running)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll found Story 4.1 code-review ACP session `agent:claude:acp:75136ba5-09be-406d-8d9e-69c76d2c1207` still had no transcript after >30 minutes, so it was marked timed_out for fallback recovery.
-- Next step: Fallback: start GPT-5.4 for code-review
-- next_after_acp: Start story 4.2: Export Bookmarks as JSON — dev+prep parallel
+- Last action: Heartbeat fallback completed Story 4.1 code review with fix commit `a5d592d`; ACP poll pushed it and advanced the pipeline by starting Story 4.2 dev plus Story 5.1 create-story in parallel.
+- Next step: Pipeline State active — poll cron handling
+- next_after_acp: Run code-review for story 4.2
 
-## ACP Session
-- acp_session_key: agent:claude:acp:75136ba5-09be-406d-8d9e-69c76d2c1207
-- acp_workflow: code-review
-- acp_status: timed_out
-- acp_started_at: 2026-03-20T16:57:00Z
+## Pipeline State
+- current_dev_story: 4.2 Export Bookmarks as JSON — GPT-5.4 session: agent:main:subagent:4c0bacde-0f0e-446d-8f6f-45b566514b37
+- current_prep_story: 5.1 Docker Containerization — Claude ACP session: agent:claude:acp:2489ba8b-4551-4640-b387-af7c419e0ffe
 
 ## Previous Dev Session
 - subagent_session_key: agent:main:subagent:349ac109-6f32-4df5-8e63-b1c2ea6466e6
@@ -106,10 +104,10 @@
 - [ ] Story 2.4: Delete Bookmark (in code-review)
 - [x] Story 3.1: Full-Text Search with FTS5 (commit: 94c8dbb)
 - [x] Story 3.2: Tag Filtering (commit: 079bd72 + review fix 9daf1b1)
-- [ ] Story 3.3: Tag Listing and Cleanup (code-review running; commit: bab03ad)
-- [ ] Story 4.1: Import Netscape HTML Bookmarks (in code-review)
-- [ ] Story 4.2: Export Bookmarks as JSON (ready-for-dev)
-- [ ] Story 5.1: Docker Containerization
+- [x] Story 3.3: Tag Listing and Cleanup (commit: bab03ad)
+- [x] Story 4.1: Import Netscape HTML Bookmarks (commit: d145be8 + review fix a5d592d)
+- [ ] Story 4.2: Export Bookmarks as JSON (dev running)
+- [ ] Story 5.1: Docker Containerization (create-story running)
 
 ## Completed Workflows
 - [x] create-product-brief
@@ -175,6 +173,7 @@
 - [x] create-story — Story 4.1 (commit: bb12c8b)
 - [x] dev-story — Story 4.1 (commit: d145be8)
 - [x] create-story — Story 4.2 (commit: 2c37ac1)
+- [x] code-review — Story 4.1 (commit: a5d592d)
 - [x] dev-story — Story 3.2 (commit: 079bd72)
 - [x] create-story — Story 3.3 (commit: 2c6cc69)
 - [x] dev-story — Story 3.3 (commit: bab03ad)
@@ -182,6 +181,7 @@
 - [x] create-story — Story 4.1 (commit: bb12c8b)
 - [x] dev-story — Story 4.1 (commit: d145be8)
 - [x] create-story — Story 4.2 (commit: 2c37ac1)
+- [x] code-review — Story 4.1 (commit: a5d592d)
 - [x] create-story — Story 2.3
 - [x] dev-story — Story 2.3
 

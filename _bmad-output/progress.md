@@ -5,15 +5,15 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 1.5 Error Handling and Input Validation Framework (create-story running)
+- Current story: Story 1.5 Error Handling and Input Validation Framework (dev-story queued)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll detected completed `code-review` for Story 1.4, committed and pushed Story 1.4 as `ff1d3a6`, then started `create-story` for Story 1.5 via ACP session `agent:claude:acp:3cd8759c-1ddd-4d15-9ed6-1b2dc3138134`.
-- Next step: Poll ACP session agent:claude:acp:3cd8759c-1ddd-4d15-9ed6-1b2dc3138134 for `create-story` completion, then start `dev-story` for Story 1.5 Error Handling and Input Validation Framework.
+- Last action: ACP poll detected completed `create-story` for Story 1.5, marked the workflow complete, and committed/pushed the story artifact as `f93019e`.
+- Next step: Start `dev-story` for Story 1.5 Error Handling and Input Validation Framework via GPT-5.4 subagent.
 
 ## Active Create Story Session
 - acp_session_key: agent:claude:acp:3cd8759c-1ddd-4d15-9ed6-1b2dc3138134
 - acp_workflow: create-story
-- acp_status: running
+- acp_status: completed
 - acp_started_at: 2026-03-20T11:44:00Z
 
 ## Previous Code Review Session
@@ -70,6 +70,15 @@
 - [x] dev-story — Story 1.2 (commit: ba3da43)
 - [x] code-review — Story 1.2 (commit: be853ae)
 - [x] Story 1.2 loop complete (commit: be853ae)
+- [x] create-story — Story 1.3
+- [x] dev-story — Story 1.3
+- [x] code-review — Story 1.3 (fallback complete)
+- [x] Story 1.3 loop complete (commit: 92e9812 + follow-up tests)
+- [x] create-story — Story 1.4
+- [x] dev-story — Story 1.4
+- [x] code-review — Story 1.4
+- [x] Story 1.4 loop complete (commit: ff1d3a6)
+- [x] create-story — Story 1.5 (commit: f93019e)
 - [x] create-story — Story 1.3
 - [x] dev-story — Story 1.3
 - [x] code-review — Story 1.3

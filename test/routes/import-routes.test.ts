@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createApp } from '../../src/app.js';
 import type { DatabaseManager } from '../../src/db/database.js';
@@ -9,6 +9,20 @@ import { setApiKeyHash } from '../../src/db/repositories/settings-repository.js'
 import { createInMemoryManager } from '../helpers.js';
 
 const API_KEY = 'test-api-key';
+
+const { loggerError } = vi.hoisted(() => ({
+  loggerError: vi.fn(),
+}));
+
+vi.mock('../../src/middleware/logger-middleware.js', () => ({
+  logger: {
+    info: () => undefined,
+    debug: () => undefined,
+    warn: () => undefined,
+    error: loggerError,
+  },
+  loggerMiddleware: () => async (_c: unknown, next: () => Promise<void>) => next(),
+}));
 
 const authorizedImportRequest = (app: ReturnType<typeof createApp>, file: File) => {
   const form = new FormData();
@@ -115,7 +129,8 @@ describe('import routes', () => {
     });
   });
 
-  it('rejects files over the 10MB route limit', async () => {
+  it('rejects files over the 10MB route limit without logging an unhandled error', async () => {
+    loggerError.mockClear();
     const app = createApp();
     const oversizedFile = new File(['x'.repeat((10 * 1024 * 1024) + 1)], 'huge.html', { type: 'text/html' });
 
@@ -128,5 +143,6 @@ describe('import routes', () => {
         message: 'Request body exceeds 10MB limit',
       },
     });
+    expect(loggerError).not.toHaveBeenCalled();
   });
 });

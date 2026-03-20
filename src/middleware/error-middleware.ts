@@ -99,6 +99,10 @@ const isBodyLimitError = (error: unknown): boolean => {
   return isHttpError(error) && error.status === 413;
 };
 
+const isStreamingBodyLimitError = (error: unknown): error is Error => {
+  return error instanceof Error && error.name === 'BodyLimitError';
+};
+
 export const isInvalidUrlZodError = (error: ZodError): boolean => {
   return error.issues.some((issue) => (
     issue.path[0] === 'url'
@@ -158,6 +162,10 @@ export const errorHandler = (async (error: unknown, c) => {
       createErrorResponse('invalid_request', error.message || 'Invalid request'),
       status as ContentfulStatusCode,
     );
+  }
+
+  if (isStreamingBodyLimitError(error)) {
+    return c.json(createErrorResponse('invalid_request', 'Request body exceeds size limit'), 400);
   }
 
   logger.error({ err: error, event: 'unhandled_error', path: c.req.path }, 'Unhandled application error');

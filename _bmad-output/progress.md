@@ -5,16 +5,24 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 5.1 Docker Containerization (dev running)
+- Current story: Story 5.1 Docker Containerization (DONE)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll confirmed Story 4.2 code-review passed cleanly and started the final sequential dev run for Story 5.1.
-- Next step: Start story 5.1: Docker Containerization — sequential
+- Last action: ACP poll confirmed Story 5.1 code-review passed cleanly and Phase 4 implementation is complete.
+- Next step: Wait for /deploy
 - next_after_acp: Run code-review for story 5.1
 
-## Active Dev Session
+## ACP Session
+- acp_session_key: agent:claude:acp:13dbf100-ad0f-48f8-a93d-04c43a42c269
+- acp_started_at: 2026-03-20T18:34:00Z
+- acp_workflow: code-review
+- acp_status: completed
+- next_after_acp: PHASE 4 COMPLETE -> Wait for /deploy
+
+## Previous Dev Session
 - subagent_session_key: agent:main:subagent:19d2ff3f-9f1d-4ae7-9a68-f69a238f47d9
 - subagent_workflow: dev-story
-- subagent_status: running
+- subagent_status: completed
+- subagent_started_at: 2026-03-20T18:28:00Z
 
 ## Previous Dev Session
 - subagent_session_key: agent:main:subagent:349ac109-6f32-4df5-8e63-b1c2ea6466e6
@@ -108,7 +116,7 @@
 - [x] Story 3.3: Tag Listing and Cleanup (commit: bab03ad)
 - [x] Story 4.1: Import Netscape HTML Bookmarks (commit: d145be8 + review fix a5d592d)
 - [x] Story 4.2: Export Bookmarks as JSON (commit: fecd258)
-- [ ] Story 5.1: Docker Containerization (dev running)
+- [x] Story 5.1: Docker Containerization (commit: 4443b0d)
 
 ## Completed Workflows
 - [x] create-product-brief
@@ -178,6 +186,8 @@
 - [x] dev-story — Story 4.2 (commit: fecd258)
 - [x] create-story — Story 5.1 (commit: 0580e06)
 - [x] code-review — Story 4.2 (commit: 0580e06)
+- [x] dev-story — Story 5.1 (commit: 4443b0d)
+- [x] code-review — Story 5.1 (commit: 4443b0d)
 - [x] dev-story — Story 3.2 (commit: 079bd72)
 - [x] create-story — Story 3.3 (commit: 2c6cc69)
 - [x] dev-story — Story 3.3 (commit: bab03ad)
@@ -189,6 +199,8 @@
 - [x] dev-story — Story 4.2 (commit: fecd258)
 - [x] create-story — Story 5.1 (commit: 0580e06)
 - [x] code-review — Story 4.2 (commit: 0580e06)
+- [x] dev-story — Story 5.1 (commit: 4443b0d)
+- [x] code-review — Story 5.1 (commit: 4443b0d)
 - [x] create-story — Story 2.3
 - [x] dev-story — Story 2.3
 

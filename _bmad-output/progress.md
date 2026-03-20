@@ -5,15 +5,17 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 3.1 Full-Text Search with FTS5 (dev running); Story 3.2 Tag Filtering (create-story running)
+- Current story: Story 3.1 Full-Text Search with FTS5 (code-review running); Story 3.2 Tag Filtering (ready-for-dev)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll confirmed Story 2.4 code-review passed (`8c970a6`) and manually advanced the pipeline by starting Story 3.1 dev plus Story 3.2 create-story in parallel due BMAD tool-state mismatch.
-- Next step: Pipeline State active — poll cron handling
-- next_after_acp: Run code-review for story 3.1
+- Last action: ACP poll confirmed Story 3.1 dev (`94c8dbb`) and Story 3.2 create-story completion, then committed/pushed the parallel close (`0444a4d`) and spawned code-review for Story 3.1.
+- Next step: ACP session running — poll cron active
+- next_after_acp: Start story 3.2: Tag Filtering — dev+prep parallel
 
-## Pipeline State
-- current_dev_story: 3.1 Full-Text Search with FTS5 — GPT-5.4 session: agent:main:subagent:6af09e18-341c-4915-a598-ea2b2241bf2a
-- current_prep_story: 3.2 Tag Filtering — Claude ACP session: agent:claude:acp:6e052281-d68b-4848-89d4-59abc3a5523e
+## ACP Session
+- acp_session_key: agent:claude:acp:36c7b565-217b-4600-ba46-f310145e2739
+- acp_workflow: code-review
+- acp_status: running
+- acp_started_at: 2026-03-20T15:57:00Z
 
 ## Previous Create Story Session
 - acp_session_key: agent:claude:acp:e416cb9e-870f-4732-ab85-5ed597d2d6f4
@@ -96,8 +98,8 @@
 - [x] Story 2.2: Get and List Bookmarks (commit: 92ab074)
 - [ ] Story 2.3: Update Bookmark (in code-review)
 - [ ] Story 2.4: Delete Bookmark (in code-review)
-- [ ] Story 3.1: Full-Text Search with FTS5
-- [ ] Story 3.2: Tag Filtering
+- [ ] Story 3.1: Full-Text Search with FTS5 (in code-review)
+- [ ] Story 3.2: Tag Filtering (ready-for-dev)
 - [ ] Story 3.3: Tag Listing and Cleanup
 - [ ] Story 4.1: Import Netscape HTML Bookmarks
 - [ ] Story 4.2: Export Bookmarks as JSON
@@ -156,6 +158,8 @@
 - [x] create-story — Story 2.4
 - [x] dev-story — Story 2.4 (commit: b5c5f39)
 - [x] create-story — Story 3.1
+- [x] dev-story — Story 3.1 (commit: 94c8dbb)
+- [x] create-story — Story 3.2 (commit: 0444a4d)
 - [x] create-story — Story 2.3
 - [x] dev-story — Story 2.3
 

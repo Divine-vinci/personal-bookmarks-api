@@ -7,8 +7,8 @@
 - Phase: 4
 - Current story: Story 2.4 Delete Bookmark (dev-story running); Story 3.1 Full-Text Search with FTS5 (create-story running)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll found create-story for Story 3.1 completed, but dev-story for Story 2.4 produced no transcript output after >30 minutes; marked dev-story track timed out for heartbeat recovery.
-- Next step: Fallback: start GPT-5.4 for dev-story
+- Last action: Heartbeat recovery committed pending BMAD artifacts and is starting a synchronous GPT-5.4 fallback for Story 2.4 dev-story after the prior session timed out with no transcript output.
+- Next step: Fallback in progress — wait for Story 2.4 dev-story completion, then run code-review and resume Story 3.1 parallel track
 - next_after_acp: Start story 3.1: Full-Text Search with FTS5 — dev+prep parallel
 
 ## Pipeline State

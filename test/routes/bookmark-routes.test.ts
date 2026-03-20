@@ -35,6 +35,13 @@ const authorizedPutRequest = (app: ReturnType<typeof createApp>, path: string, b
   body: JSON.stringify(body),
 });
 
+const authorizedDeleteRequest = (app: ReturnType<typeof createApp>, path: string) => app.request(path, {
+  method: 'DELETE',
+  headers: {
+    authorization: `Bearer ${API_KEY}`,
+  },
+});
+
 describe('bookmark routes', () => {
   let manager: DatabaseManager;
 
@@ -945,5 +952,82 @@ describe('bookmark routes', () => {
     await expect(response.json()).resolves.toMatchObject({
       tags: [],
     });
+  });
+
+
+  it('deletes a bookmark and returns 204 with an empty body', async () => {
+    const app = createApp();
+
+    const createResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/delete-me',
+      title: 'Delete me',
+      tags: ['temp'],
+    });
+    const created = await createResponse.json() as { id: number };
+
+    const deleteResponse = await authorizedDeleteRequest(app, `/api/bookmarks/${created.id}`);
+
+    expect(deleteResponse.status).toBe(204);
+    expect(await deleteResponse.text()).toBe('');
+
+    const getResponse = await authorizedGetRequest(app, `/api/bookmarks/${created.id}`);
+    expect(getResponse.status).toBe(404);
+  });
+
+  it('removes bookmark tag associations but leaves orphaned tags in place', async () => {
+    const app = createApp();
+
+    const createResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/delete-tag-associations',
+      title: 'Delete tags',
+      tags: ['orphaned-tag'],
+    });
+    const created = await createResponse.json() as { id: number };
+
+    const deleteResponse = await authorizedDeleteRequest(app, `/api/bookmarks/${created.id}`);
+
+    expect(deleteResponse.status).toBe(204);
+
+    const db = getDatabase();
+    const bookmarkTagRows = db.prepare('SELECT bookmark_id, tag_id FROM bookmark_tags WHERE bookmark_id = ?').all(created.id) as Array<{ bookmark_id: number; tag_id: number }>;
+    const orphanedTag = db.prepare('SELECT id, name FROM tags WHERE name = ?').get('orphaned-tag') as { id: number; name: string } | undefined;
+
+    expect(bookmarkTagRows).toEqual([]);
+    expect(orphanedTag).toMatchObject({ name: 'orphaned-tag' });
+  });
+
+  it('returns 404 not_found when deleting a non-existent bookmark', async () => {
+    const app = createApp();
+
+    const response = await authorizedDeleteRequest(app, '/api/bookmarks/999');
+
+    expect(response.status).toBe(404);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        code: 'not_found',
+        message: 'Bookmark not found',
+      },
+    });
+  });
+
+  it('returns 422 for a non-numeric bookmark ID on DELETE', async () => {
+    const app = createApp();
+
+    const response = await authorizedDeleteRequest(app, '/api/bookmarks/not-a-number');
+
+    expect(response.status).toBe(422);
+    const body = await response.json() as { error: { code: string; details: Array<{ field: string; message: string }> } };
+    expect(body.error.code).toBe('validation_error');
+    expect(body.error.details.some((detail) => detail.field === 'id')).toBe(true);
+  });
+
+  it('returns 401 for unauthenticated DELETE requests', async () => {
+    const app = createApp();
+
+    const response = await app.request('/api/bookmarks/1', {
+      method: 'DELETE',
+    });
+
+    expect(response.status).toBe(401);
   });
 });

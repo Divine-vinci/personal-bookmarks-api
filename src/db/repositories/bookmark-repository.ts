@@ -173,6 +173,26 @@ export const createBookmark = (input: CreateBookmarkInput): Bookmark => {
   }
 };
 
+export const deleteBookmark = (id: number): void => {
+  const db = getDatabase();
+  const selectExisting = db.prepare('SELECT id FROM bookmarks WHERE id = ?');
+  const deleteTagAssociations = db.prepare('DELETE FROM bookmark_tags WHERE bookmark_id = ?');
+  const deleteBookmarkStmt = db.prepare('DELETE FROM bookmarks WHERE id = ?');
+
+  const deleteBookmarkTx = db.transaction((bookmarkId: number) => {
+    const existingBookmark = selectExisting.get(bookmarkId) as { id: number } | undefined;
+
+    if (!existingBookmark) {
+      throw notFound('Bookmark not found');
+    }
+
+    deleteTagAssociations.run(bookmarkId);
+    deleteBookmarkStmt.run(bookmarkId);
+  });
+
+  deleteBookmarkTx(id);
+};
+
 export const updateBookmark = (id: number, input: UpdateBookmarkInput): Bookmark => {
   const db = getDatabase();
   const normalizedTags = Array.from(new Set(input.tags ?? []));

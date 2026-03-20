@@ -5,17 +5,15 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 3.2 Tag Filtering (code-review running); Story 3.3 Tag Listing and Cleanup (ready-for-dev)
+- Current story: Story 3.3 Tag Listing and Cleanup (dev running); Story 4.1 Import Netscape HTML Bookmarks (create-story running)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll confirmed Story 3.2 dev (`079bd72`) and Story 3.3 create-story completion, then committed/pushed the parallel close (`2c6cc69`) and spawned code-review for Story 3.2.
+- Last action: ACP poll confirmed Story 3.2 code-review fixes were committed (`9daf1b1`) and advanced the pipeline by starting Story 3.3 dev plus Story 4.1 create-story in parallel.
 - Next step: ACP session running — poll cron active
-- next_after_acp: Start story 3.3: Tag Listing and Cleanup — dev+prep parallel
+- next_after_acp: Run code-review for story 3.3
 
-## ACP Session
-- acp_session_key: agent:claude:acp:c2e27239-3bad-46a5-a0e9-03ad9ce374fa
-- acp_workflow: code-review
-- acp_status: running
-- acp_started_at: 2026-03-20T16:17:00Z
+## Pipeline State
+- current_dev_story: 3.3 Tag Listing and Cleanup — GPT-5.4 session: agent:main:subagent:349ac109-6f32-4df5-8e63-b1c2ea6466e6
+- current_prep_story: 4.1 Import Netscape HTML Bookmarks — Claude ACP session: agent:claude:acp:03e8f6d0-5d8b-40f0-9ebf-b64d65ab8c97
 
 ## Previous Create Story Session
 - acp_session_key: agent:claude:acp:e416cb9e-870f-4732-ab85-5ed597d2d6f4
@@ -99,9 +97,9 @@
 - [ ] Story 2.3: Update Bookmark (in code-review)
 - [ ] Story 2.4: Delete Bookmark (in code-review)
 - [x] Story 3.1: Full-Text Search with FTS5 (commit: 94c8dbb)
-- [ ] Story 3.2: Tag Filtering (in code-review)
-- [ ] Story 3.3: Tag Listing and Cleanup (ready-for-dev)
-- [ ] Story 4.1: Import Netscape HTML Bookmarks
+- [x] Story 3.2: Tag Filtering (commit: 079bd72 + review fix 9daf1b1)
+- [ ] Story 3.3: Tag Listing and Cleanup (dev running)
+- [ ] Story 4.1: Import Netscape HTML Bookmarks (create-story running)
 - [ ] Story 4.2: Export Bookmarks as JSON
 - [ ] Story 5.1: Docker Containerization
 
@@ -161,6 +159,9 @@
 - [x] dev-story — Story 3.1 (commit: 94c8dbb)
 - [x] create-story — Story 3.2 (commit: 0444a4d)
 - [x] code-review — Story 3.1 (commit: 0444a4d)
+- [x] dev-story — Story 3.2 (commit: 079bd72)
+- [x] code-review — Story 3.2 (commit: 9daf1b1)
+- [x] create-story — Story 3.3 (commit: 2c6cc69)
 - [x] dev-story — Story 3.2 (commit: 079bd72)
 - [x] create-story — Story 3.3 (commit: 2c6cc69)
 - [x] create-story — Story 2.3

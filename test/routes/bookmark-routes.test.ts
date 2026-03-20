@@ -974,7 +974,7 @@ describe('bookmark routes', () => {
     expect(getResponse.status).toBe(404);
   });
 
-  it('removes bookmark tag associations but leaves orphaned tags in place', async () => {
+  it('removes bookmark tag associations and cleans up orphaned tags', async () => {
     const app = createApp();
 
     const createResponse = await authorizedJsonRequest(app, {
@@ -993,7 +993,7 @@ describe('bookmark routes', () => {
     const orphanedTag = db.prepare('SELECT id, name FROM tags WHERE name = ?').get('orphaned-tag') as { id: number; name: string } | undefined;
 
     expect(bookmarkTagRows).toEqual([]);
-    expect(orphanedTag).toMatchObject({ name: 'orphaned-tag' });
+    expect(orphanedTag).toBeUndefined();
   });
 
   it('returns 404 not_found when deleting a non-existent bookmark', async () => {

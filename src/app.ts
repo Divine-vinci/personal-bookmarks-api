@@ -10,6 +10,7 @@ import { loggerMiddleware } from './middleware/logger-middleware.js';
 import { createAuthRoutes } from './routes/auth-routes.js';
 import { createBookmarkRoutes } from './routes/bookmark-routes.js';
 import { createHealthRoutes } from './routes/health-routes.js';
+import { createTagRoutes } from './routes/tag-routes.js';
 
 export const createApp = (appConfig: AppConfig = config) => {
   const app = new Hono();
@@ -29,7 +30,7 @@ export const createApp = (appConfig: AppConfig = config) => {
   app.route('/api/health', createHealthRoutes());
   app.route('/api/auth', createAuthRoutes());
   app.route('/api/bookmarks', createBookmarkRoutes());
-  app.route('/api/tags', new Hono());
+  app.route('/api/tags', createTagRoutes());
 
   return app;
 };

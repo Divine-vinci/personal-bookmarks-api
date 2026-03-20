@@ -78,6 +78,13 @@ const getTagsByBookmarkId = (db: SqliteDatabase, bookmarkIds: number[]): Map<num
   return tagsByBookmarkId;
 };
 
+const cleanupOrphanedTags = (db: SqliteDatabase): void => {
+  db.prepare(
+    `DELETE FROM tags
+     WHERE id NOT IN (SELECT DISTINCT tag_id FROM bookmark_tags)`,
+  ).run();
+};
+
 const getBookmarksWithTags = (db: SqliteDatabase, rows: BookmarkRow[]): PaginatedResponse<Bookmark>['data'] => {
   if (rows.length === 0) {
     return [];
@@ -358,6 +365,7 @@ export const deleteBookmark = (id: number): void => {
     }
 
     deleteTagAssociations.run(bookmarkId);
+    cleanupOrphanedTags(db);
     deleteBookmarkStmt.run(bookmarkId);
   });
 
@@ -408,6 +416,8 @@ export const updateBookmark = (id: number, input: UpdateBookmarkInput): Bookmark
 
       insertBookmarkTag.run(bookmarkId, tagRow.id);
     }
+
+    cleanupOrphanedTags(db);
   });
 
   try {

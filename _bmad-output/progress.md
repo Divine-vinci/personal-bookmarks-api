@@ -5,10 +5,10 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 1.5 Error Handling and Input Validation Framework (code-review running)
+- Current story: Story 2.1 Create Bookmark (create-story running)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: Heartbeat recovery committed Story 1.5 `dev-story` as `c85a0f2` and started `code-review` via ACP session `agent:claude:acp:bfe68edb-312d-4450-b61a-a129368033f4`.
-- Next step: Poll ACP session agent:claude:acp:bfe68edb-312d-4450-b61a-a129368033f4 for `code-review` completion.
+- Last action: ACP poll completed `code-review` for Story 1.5, committed/pushed `cc441d3`, started `create-story` for Story 2.1 via ACP session `agent:claude:acp:b545526a-0a4d-4f57-936d-26ea1d50b55b`.
+- Next step: Poll ACP session agent:claude:acp:b545526a-0a4d-4f57-936d-26ea1d50b55b for `create-story` completion.
 
 ## Active Create Story Session
 - acp_session_key: agent:claude:acp:3cd8759c-1ddd-4d15-9ed6-1b2dc3138134
@@ -16,10 +16,16 @@
 - acp_status: completed
 - acp_started_at: 2026-03-20T11:44:00Z
 
-## Active Code Review Session
+## Active Create Story Session
+- acp_session_key: agent:claude:acp:b545526a-0a4d-4f57-936d-26ea1d50b55b
+- acp_workflow: create-story
+- acp_status: running
+- acp_started_at: 2026-03-20T12:27:00Z
+
+## Previous Code Review Session
 - acp_session_key: agent:claude:acp:bfe68edb-312d-4450-b61a-a129368033f4
 - acp_workflow: code-review
-- acp_status: running
+- acp_status: completed (detected by ACP poll on 2026-03-20)
 - acp_started_at: 2026-03-20T12:16:00Z
 
 ## Previous Code Review Session
@@ -50,7 +56,7 @@
 - [x] Story 1.2: Database Setup and Migration System (commit: be853ae)
 - [x] Story 1.3: API Key Authentication (commit: af1c267)
 - [x] Story 1.4: Health Check Endpoint (commit: ff1d3a6)
-- [ ] Story 1.5: Error Handling and Input Validation Framework
+- [x] Story 1.5: Error Handling and Input Validation Framework (commit: cc441d3)
 - [ ] Story 2.1: Create Bookmark
 - [ ] Story 2.2: Get and List Bookmarks
 - [ ] Story 2.3: Update Bookmark
@@ -85,6 +91,9 @@
 - [x] code-review — Story 1.4
 - [x] Story 1.4 loop complete (commit: ff1d3a6)
 - [x] create-story — Story 1.5 (commit: f93019e)
+- [x] dev-story — Story 1.5 (commit: c85a0f2)
+- [x] code-review — Story 1.5 (commit: cc441d3)
+- [x] Story 1.5 loop complete (commit: cc441d3)
 - [x] create-story — Story 1.3
 - [x] dev-story — Story 1.3
 - [x] code-review — Story 1.3

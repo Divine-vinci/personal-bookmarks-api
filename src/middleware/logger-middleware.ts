@@ -1,14 +1,10 @@
-import { createRequire } from 'node:module';
-
 import type { HttpBindings } from '@hono/node-server';
 import type { MiddlewareHandler } from 'hono';
 import pino from 'pino';
+import { pinoHttp } from 'pino-http';
 
 import type { AppConfig } from '../config.js';
 import { config } from '../config.js';
-
-const require = createRequire(import.meta.url);
-const pinoHttp = require('pino-http') as typeof import('pino-http').default;
 
 export type NodeServerEnv = {
   Bindings: HttpBindings;
@@ -26,14 +22,15 @@ export const createLogger = (
 
 export const logger = createLogger();
 
-const createHttpLogger = (appConfig: AppConfig = config) =>
+const createHttpLogger = (parentLogger: pino.Logger) =>
   pinoHttp({
-    logger: createLogger(appConfig),
+    logger: parentLogger,
     quietReqLogger: true,
   });
 
 export const loggerMiddleware = (appConfig: AppConfig = config): MiddlewareHandler<NodeServerEnv> => {
-  const httpLogger = createHttpLogger(appConfig);
+  const appLogger = createLogger(appConfig);
+  const httpLogger = createHttpLogger(appLogger);
 
   return async (c, next) => {
     const bindings = (c.env ?? {}) as Partial<HttpBindings>;

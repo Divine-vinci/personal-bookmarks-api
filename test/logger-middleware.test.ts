@@ -53,4 +53,25 @@ describe('loggerMiddleware', () => {
 
     expect(next).toHaveBeenCalledOnce();
   });
+
+  it('invokes pino-http and calls next when node bindings are present', async () => {
+    const next = vi.fn().mockResolvedValue(undefined);
+    const middleware = loggerMiddleware(
+      createConfig({ LOG_LEVEL: 'silent' } as NodeJS.ProcessEnv),
+    );
+
+    const incoming = { method: 'GET', url: '/', headers: {} };
+    const outgoing = {
+      setHeader: vi.fn(),
+      getHeader: vi.fn(),
+      end: vi.fn(),
+    };
+
+    await middleware(
+      { env: { incoming, outgoing } } as never,
+      next,
+    );
+
+    expect(next).toHaveBeenCalledOnce();
+  });
 });

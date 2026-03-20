@@ -6,8 +6,8 @@
 - Phase: 4
 - Current story: none
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: Resumed stalled BMAD execution and started `dev-story` for Story 1.1 via subagent `agent:main:subagent:d5071e4a-aa9f-42f9-95de-f53d507ea794`.
-- Next step: Poll subagent session agent:main:subagent:d5071e4a-aa9f-42f9-95de-f53d507ea794 for `dev-story` completion, then start `code-review` for Story 1.1 if implementation passes.
+- Last action: Heartbeat recovered stalled BMAD execution, confirmed `dev-story` for Story 1.1 completed in BMAD state, and started `code-review` via ACP session `agent:claude:acp:9e939b35-3db9-4818-80a2-23a8851ffa37`.
+- Next step: Poll ACP session agent:claude:acp:9e939b35-3db9-4818-80a2-23a8851ffa37 for `code-review` completion, then commit & push Story 1.1 and continue the Phase 4 story loop.
 
 ## Active Dev Session
 - subagent_session_key: agent:main:subagent:d5071e4a-aa9f-42f9-95de-f53d507ea794
@@ -28,6 +28,12 @@
 - [x] sprint-planning
 ## Blockers
 - None
+
+## Active Code Review Session
+- acp_session_key: agent:claude:acp:9e939b35-3db9-4818-80a2-23a8851ffa37
+- acp_workflow: code-review
+- acp_status: running
+- acp_started_at: 2026-03-20T06:30:00Z
 
 ## ACP Sessions
 ### create-story

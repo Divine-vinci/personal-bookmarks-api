@@ -35,4 +35,16 @@ describe('createConfig', () => {
       nodeEnv: 'test',
     });
   });
+
+  it('falls back to default port for out-of-range values', () => {
+    expect(createConfig({ PORT: '0' } as NodeJS.ProcessEnv).port).toBe(3000);
+    expect(createConfig({ PORT: '-1' } as NodeJS.ProcessEnv).port).toBe(3000);
+    expect(createConfig({ PORT: '99999' } as NodeJS.ProcessEnv).port).toBe(3000);
+    expect(createConfig({ PORT: '65535' } as NodeJS.ProcessEnv).port).toBe(65535);
+    expect(createConfig({ PORT: '65536' } as NodeJS.ProcessEnv).port).toBe(3000);
+  });
+
+  it('falls back to default port for empty string', () => {
+    expect(createConfig({ PORT: '' } as NodeJS.ProcessEnv).port).toBe(3000);
+  });
 });

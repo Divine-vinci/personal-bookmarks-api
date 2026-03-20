@@ -9,6 +9,7 @@ export interface AppConfig {
 }
 
 const DEFAULT_PORT = 3000;
+const MAX_PORT = 65535;
 const DEFAULT_DATA_DIR = './data';
 const DEFAULT_LOG_LEVEL: LogLevel = 'info';
 const DEFAULT_NODE_ENV = 'development';
@@ -27,7 +28,7 @@ const parsePort = (value: string | undefined): number => {
   }
 
   const port = Number.parseInt(value, 10);
-  return Number.isInteger(port) && port > 0 ? port : DEFAULT_PORT;
+  return Number.isInteger(port) && port > 0 && port <= MAX_PORT ? port : DEFAULT_PORT;
 };
 
 const parseCorsOrigins = (value: string | undefined): string[] => {

@@ -35,4 +35,20 @@ describe('createApp', () => {
 
     expect(response.headers.get('access-control-allow-origin')).toBe('https://my-dashboard.com');
   });
+
+  it('does not return CORS headers for non-configured origins', async () => {
+    const app = createApp(
+      createConfig({
+        CORS_ORIGINS: 'http://localhost:3001',
+      } as NodeJS.ProcessEnv),
+    );
+
+    const response = await app.request('/bookmarks', {
+      headers: {
+        Origin: 'https://evil-site.com',
+      },
+    });
+
+    expect(response.headers.get('access-control-allow-origin')).toBeNull();
+  });
 });

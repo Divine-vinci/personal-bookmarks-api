@@ -5,15 +5,17 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 4.1 Import Netscape HTML Bookmarks (dev running); Story 4.2 Export Bookmarks as JSON (create-story running)
+- Current story: Story 4.1 Import Netscape HTML Bookmarks (code-review running); Story 4.2 Export Bookmarks as JSON (ready-for-dev)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll confirmed Story 4.1 artifact was already complete, committed it (`bb12c8b`), then started Story 4.1 dev plus Story 4.2 create-story in parallel.
+- Last action: ACP poll confirmed Story 4.1 dev (`d145be8`) and Story 4.2 create-story completion, then committed/pushed the parallel close (`2c37ac1`) and spawned code-review for Story 4.1.
 - Next step: ACP session running — poll cron active
-- next_after_acp: Run code-review for story 4.1
+- next_after_acp: Start story 4.2: Export Bookmarks as JSON — dev+prep parallel
 
-## Pipeline State
-- current_dev_story: 4.1 Import Netscape HTML Bookmarks — GPT-5.4 session: agent:main:subagent:fc815b03-f4fa-4fe5-b9bb-b8316cf91834
-- current_prep_story: 4.2 Export Bookmarks as JSON — Claude ACP session: agent:claude:acp:10a6b81c-7152-4b5e-b0be-dca09b1c618c
+## ACP Session
+- acp_session_key: agent:claude:acp:75136ba5-09be-406d-8d9e-69c76d2c1207
+- acp_workflow: code-review
+- acp_status: running
+- acp_started_at: 2026-03-20T16:57:00Z
 
 ## Previous Dev Session
 - subagent_session_key: agent:main:subagent:349ac109-6f32-4df5-8e63-b1c2ea6466e6
@@ -105,8 +107,8 @@
 - [x] Story 3.1: Full-Text Search with FTS5 (commit: 94c8dbb)
 - [x] Story 3.2: Tag Filtering (commit: 079bd72 + review fix 9daf1b1)
 - [ ] Story 3.3: Tag Listing and Cleanup (code-review running; commit: bab03ad)
-- [ ] Story 4.1: Import Netscape HTML Bookmarks (dev running)
-- [ ] Story 4.2: Export Bookmarks as JSON (create-story running)
+- [ ] Story 4.1: Import Netscape HTML Bookmarks (in code-review)
+- [ ] Story 4.2: Export Bookmarks as JSON (ready-for-dev)
 - [ ] Story 5.1: Docker Containerization
 
 ## Completed Workflows
@@ -171,11 +173,15 @@
 - [x] dev-story — Story 3.3 (commit: bab03ad)
 - [x] code-review — Story 3.3 (commit: bab03ad)
 - [x] create-story — Story 4.1 (commit: bb12c8b)
+- [x] dev-story — Story 4.1 (commit: d145be8)
+- [x] create-story — Story 4.2 (commit: 2c37ac1)
 - [x] dev-story — Story 3.2 (commit: 079bd72)
 - [x] create-story — Story 3.3 (commit: 2c6cc69)
 - [x] dev-story — Story 3.3 (commit: bab03ad)
 - [x] code-review — Story 3.3 (commit: bab03ad)
 - [x] create-story — Story 4.1 (commit: bb12c8b)
+- [x] dev-story — Story 4.1 (commit: d145be8)
+- [x] create-story — Story 4.2 (commit: 2c37ac1)
 - [x] create-story — Story 2.3
 - [x] dev-story — Story 2.3
 

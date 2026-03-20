@@ -5,15 +5,23 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 3.3 Tag Listing and Cleanup (dev running); Story 4.1 Import Netscape HTML Bookmarks (create-story running)
+- Current story: Story 4.1 Import Netscape HTML Bookmarks (create-story recovery running)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll confirmed Story 3.2 code-review fixes were committed (`9daf1b1`) and advanced the pipeline by starting Story 3.3 dev plus Story 4.1 create-story in parallel.
+- Last action: ACP poll confirmed Story 3.3 code-review passed cleanly and restarted Story 4.1 create-story after the previous ACP prep session stalled with no transcript output.
 - Next step: ACP session running — poll cron active
-- next_after_acp: Run code-review for story 3.3
+- next_after_acp: Start story 4.1: Import Netscape HTML Bookmarks — dev+prep parallel
 
-## Pipeline State
-- current_dev_story: 3.3 Tag Listing and Cleanup — GPT-5.4 session: agent:main:subagent:349ac109-6f32-4df5-8e63-b1c2ea6466e6
-- current_prep_story: 4.1 Import Netscape HTML Bookmarks — Claude ACP session: agent:claude:acp:03e8f6d0-5d8b-40f0-9ebf-b64d65ab8c97
+## ACP Session
+- acp_session_key: agent:claude:acp:e4f23b26-f601-4086-82f9-dcef098dbc31
+- acp_workflow: create-story
+- acp_status: running
+- acp_started_at: 2026-03-20T16:37:00Z
+
+## Previous Dev Session
+- subagent_session_key: agent:main:subagent:349ac109-6f32-4df5-8e63-b1c2ea6466e6
+- subagent_workflow: dev-story
+- subagent_status: completed
+- subagent_started_at: 2026-03-20T15:47:00Z
 
 ## Previous Create Story Session
 - acp_session_key: agent:claude:acp:e416cb9e-870f-4732-ab85-5ed597d2d6f4
@@ -98,7 +106,7 @@
 - [ ] Story 2.4: Delete Bookmark (in code-review)
 - [x] Story 3.1: Full-Text Search with FTS5 (commit: 94c8dbb)
 - [x] Story 3.2: Tag Filtering (commit: 079bd72 + review fix 9daf1b1)
-- [ ] Story 3.3: Tag Listing and Cleanup (dev running)
+- [ ] Story 3.3: Tag Listing and Cleanup (code-review running; commit: bab03ad)
 - [ ] Story 4.1: Import Netscape HTML Bookmarks (create-story running)
 - [ ] Story 4.2: Export Bookmarks as JSON
 - [ ] Story 5.1: Docker Containerization
@@ -162,8 +170,12 @@
 - [x] dev-story — Story 3.2 (commit: 079bd72)
 - [x] code-review — Story 3.2 (commit: 9daf1b1)
 - [x] create-story — Story 3.3 (commit: 2c6cc69)
+- [x] dev-story — Story 3.3 (commit: bab03ad)
+- [x] code-review — Story 3.3 (commit: bab03ad)
 - [x] dev-story — Story 3.2 (commit: 079bd72)
 - [x] create-story — Story 3.3 (commit: 2c6cc69)
+- [x] dev-story — Story 3.3 (commit: bab03ad)
+- [x] code-review — Story 3.3 (commit: bab03ad)
 - [x] create-story — Story 2.3
 - [x] dev-story — Story 2.3
 

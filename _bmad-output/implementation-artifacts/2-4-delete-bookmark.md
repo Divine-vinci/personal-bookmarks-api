@@ -1,6 +1,6 @@
 # Story 2.4: Delete Bookmark
 
-Status: ready-for-dev
+Status: code-review-complete
 
 ## Story
 
@@ -209,9 +209,20 @@ Error responses follow the standard format:
 ## Dev Agent Record
 
 ### Agent Model Used
+claude-opus-4-6
 
 ### Debug Log References
+None — no issues found during review.
 
 ### Completion Notes List
+- Code review passed with no critical/high/medium issues
+- All 110 tests pass (13 test files)
+- Implementation matches all ACs and follows established patterns from Stories 2.1–2.3
+- Transaction ordering correct (bookmark_tags deleted before bookmarks)
+- Orphaned tags correctly preserved per Epic 3 boundary
+- Test coverage: 204 success, post-delete 404, tag association removal, orphaned tag retention, 404 not_found, 422 validation, 401 auth
 
 ### File List
+- `src/db/repositories/bookmark-repository.ts` — `deleteBookmark()` function (lines 176-194)
+- `src/routes/bookmark-routes.ts` — DELETE /:id handler (lines 58-71)
+- `test/routes/bookmark-routes.test.ts` — 5 delete test cases (lines 958-1032)

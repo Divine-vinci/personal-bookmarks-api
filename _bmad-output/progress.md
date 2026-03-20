@@ -5,17 +5,15 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 2.4 Delete Bookmark (code-review running); Story 3.1 Full-Text Search with FTS5 (ready-for-dev)
+- Current story: Story 3.1 Full-Text Search with FTS5 (dev running); Story 3.2 Tag Filtering (create-story running)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll committed Story 2.4 dev implementation (b5c5f39) and spawned code-review ACP session `agent:claude:acp:775e0092-0d1a-40a5-94c0-9def61448bbe`; Story 3.1 create-story artifact is ready for the next parallel track.
-- Next step: ACP session running — poll cron active
-- next_after_acp: Start story 3.1: Full-Text Search with FTS5 — dev+prep parallel
+- Last action: ACP poll confirmed Story 2.4 code-review passed (`8c970a6`) and manually advanced the pipeline by starting Story 3.1 dev plus Story 3.2 create-story in parallel due BMAD tool-state mismatch.
+- Next step: Pipeline State active — poll cron handling
+- next_after_acp: Run code-review for story 3.1
 
-## ACP Session
-- acp_session_key: agent:claude:acp:775e0092-0d1a-40a5-94c0-9def61448bbe
-- acp_workflow: code-review
-- acp_status: running
-- acp_started_at: 2026-03-20T15:36:00Z
+## Pipeline State
+- current_dev_story: 3.1 Full-Text Search with FTS5 — GPT-5.4 session: agent:main:subagent:6af09e18-341c-4915-a598-ea2b2241bf2a
+- current_prep_story: 3.2 Tag Filtering — Claude ACP session: agent:claude:acp:6e052281-d68b-4848-89d4-59abc3a5523e
 
 ## Previous Create Story Session
 - acp_session_key: agent:claude:acp:e416cb9e-870f-4732-ab85-5ed597d2d6f4

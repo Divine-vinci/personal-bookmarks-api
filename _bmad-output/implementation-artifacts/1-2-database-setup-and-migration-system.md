@@ -1,6 +1,6 @@
 # Story 1.2: Database Setup and Migration System
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -22,36 +22,36 @@ So that the database schema is created on first run and can evolve with future c
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create `src/db/database.ts` — SQLite connection manager (AC: #1, #4)
-  - [ ] Initialize better-sqlite3 connection with database file at `{DATA_DIR}/bookmarks.db`
-  - [ ] Enable WAL mode via `PRAGMA journal_mode=WAL`
-  - [ ] Enable foreign keys via `PRAGMA foreign_keys=ON`
-  - [ ] Create `migrations` table if not exists: `id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE, applied_at TEXT NOT NULL`
-  - [ ] Implement `runMigrations()` — reads `src/db/migrations/*.sql` files, applies unapplied ones in order, records each in migrations table
-  - [ ] Export singleton database instance and initialization function
-- [ ] Task 2: Create `src/db/migrations/001-initial-schema.sql` (AC: #3)
-  - [ ] `bookmarks` table: id INTEGER PRIMARY KEY AUTOINCREMENT, url TEXT NOT NULL, title TEXT NOT NULL, description TEXT, created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-  - [ ] `tags` table: id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL
-  - [ ] `bookmark_tags` junction table: bookmark_id INTEGER NOT NULL REFERENCES bookmarks(id) ON DELETE CASCADE, tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE, PRIMARY KEY (bookmark_id, tag_id)
-  - [ ] `settings` table: key TEXT PRIMARY KEY, value TEXT NOT NULL
-  - [ ] CREATE UNIQUE INDEX idx_bookmarks_url ON bookmarks(url)
-  - [ ] CREATE UNIQUE INDEX idx_tags_name ON tags(name)
-  - [ ] CREATE INDEX idx_bookmark_tags_bookmark_id ON bookmark_tags(bookmark_id)
-  - [ ] CREATE INDEX idx_bookmark_tags_tag_id ON bookmark_tags(tag_id)
-- [ ] Task 3: Integrate database initialization into app startup (AC: #1, #2)
-  - [ ] Call database init + migration runner during app startup in `src/index.ts`
-  - [ ] Ensure DATA_DIR directory is created if it doesn't exist (use `fs.mkdirSync` with `recursive: true`)
-  - [ ] Log migration activity via Pino logger (not console.log)
-- [ ] Task 4: Write tests for database layer (AC: #1-5)
-  - [ ] Test: database file is created on first init
-  - [ ] Test: WAL mode is enabled
-  - [ ] Test: foreign keys are enabled
-  - [ ] Test: migrations table is created
-  - [ ] Test: 001 migration creates all expected tables with correct columns
-  - [ ] Test: unique indexes exist on bookmarks.url and tags.name
-  - [ ] Test: running migrations twice does not re-apply
-  - [ ] Test: migrations are applied in order
-  - [ ] Use in-memory SQLite (`:memory:`) or temp files for test isolation
+- [x] Task 1: Create `src/db/database.ts` — SQLite connection manager (AC: #1, #4)
+  - [x] Initialize better-sqlite3 connection with database file at `{DATA_DIR}/bookmarks.db`
+  - [x] Enable WAL mode via `PRAGMA journal_mode=WAL`
+  - [x] Enable foreign keys via `PRAGMA foreign_keys=ON`
+  - [x] Create `migrations` table if not exists: `id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE, applied_at TEXT NOT NULL`
+  - [x] Implement `runMigrations()` — reads `src/db/migrations/*.sql` files, applies unapplied ones in order, records each in migrations table
+  - [x] Export singleton database instance and initialization function
+- [x] Task 2: Create `src/db/migrations/001-initial-schema.sql` (AC: #3)
+  - [x] `bookmarks` table: id INTEGER PRIMARY KEY AUTOINCREMENT, url TEXT NOT NULL, title TEXT NOT NULL, description TEXT, created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  - [x] `tags` table: id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL
+  - [x] `bookmark_tags` junction table: bookmark_id INTEGER NOT NULL REFERENCES bookmarks(id) ON DELETE CASCADE, tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE, PRIMARY KEY (bookmark_id, tag_id)
+  - [x] `settings` table: key TEXT PRIMARY KEY, value TEXT NOT NULL
+  - [x] CREATE UNIQUE INDEX idx_bookmarks_url ON bookmarks(url)
+  - [x] CREATE UNIQUE INDEX idx_tags_name ON tags(name)
+  - [x] CREATE INDEX idx_bookmark_tags_bookmark_id ON bookmark_tags(bookmark_id)
+  - [x] CREATE INDEX idx_bookmark_tags_tag_id ON bookmark_tags(tag_id)
+- [x] Task 3: Integrate database initialization into app startup (AC: #1, #2)
+  - [x] Call database init + migration runner during app startup in `src/index.ts`
+  - [x] Ensure DATA_DIR directory is created if it doesn't exist (use `fs.mkdirSync` with `recursive: true`)
+  - [x] Log migration activity via Pino logger (not console.log)
+- [x] Task 4: Write tests for database layer (AC: #1-5)
+  - [x] Test: database file is created on first init
+  - [x] Test: WAL mode is enabled
+  - [x] Test: foreign keys are enabled
+  - [x] Test: migrations table is created
+  - [x] Test: 001 migration creates all expected tables with correct columns
+  - [x] Test: unique indexes exist on bookmarks.url and tags.name
+  - [x] Test: running migrations twice does not re-apply
+  - [x] Test: migrations are applied in order
+  - [x] Use in-memory SQLite (`:memory:`) or temp files for test isolation
 
 ## Dev Notes
 
@@ -235,10 +235,31 @@ for (const file of migrationFiles) {
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+openai/gpt-5.4
 
 ### Debug Log References
 
+- `npm test` — red: missing `src/db/database.ts`
+- `npm test` — green: 17/17 tests passing
+- `npm run build` — passing
+
 ### Completion Notes List
 
+- Implemented `src/db/database.ts` with better-sqlite3 singleton init, WAL mode, foreign keys, migrations table bootstrap, ordered migration execution, and parameterized migration-record queries. (AC: 1, 2, 4, 5)
+- Added `src/db/migrations/001-initial-schema.sql` with `bookmarks`, `tags`, `bookmark_tags`, and `settings` tables plus required unique/supporting indexes. (AC: 3)
+- Integrated DB init into `src/index.ts` with `fs.mkdirSync(..., { recursive: true })` before server boot and migration logging via Pino. (AC: 1, 2)
+- Corrected `src/types.ts` to architecture-spec shapes required by Story 1.2 dev notes.
+- Added `test/db/database.test.ts` covering DB creation, WAL, foreign keys, migrations table bootstrap, schema shape, unique indexes, idempotent reruns, and lexicographic migration ordering. (AC: 1-5)
+- Definition of Done: PASS — build passes; tests pass; file list updated; story status set to `review`.
+
 ### File List
+
+- src/db/database.ts
+- src/db/migrations/001-initial-schema.sql
+- src/index.ts
+- src/types.ts
+- test/db/database.test.ts
+
+### Change Log
+
+- 2026-03-20 — Implemented SQLite bootstrap + migration system, wired startup initialization, fixed shared API types, and added database-layer regression tests.

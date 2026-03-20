@@ -1,28 +1,26 @@
 export interface Bookmark {
-  id: string;
+  id: number;
   url: string;
   title: string;
-  description?: string;
-  tags: Tag[];
-  createdAt: string;
-  updatedAt: string;
+  description: string | null;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Tag {
-  id: string;
   name: string;
-  createdAt: string;
+  count: number;
 }
 
 export interface ApiError {
-  code: string;
-  message: string;
-  details?: unknown;
+  error: {
+    code: string;
+    message: string;
+  };
 }
 
 export interface PaginatedResponse<T> {
-  items: T[];
-  page: number;
-  pageSize: number;
+  data: T[];
   total: number;
 }

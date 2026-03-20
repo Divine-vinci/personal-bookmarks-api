@@ -3,19 +3,7 @@
   "projectPath": "/home/clawd/projects/personal-bookmarks-api",
   "createdAt": "2026-03-20T01:30:49.520Z",
   "currentPhase": "implementation",
-  "activeWorkflows": [
-    {
-      "id": "create-story",
-      "agentId": "sm",
-      "agentName": "Bob",
-      "mode": "yolo",
-      "currentStep": 1,
-      "totalSteps": null,
-      "currentStepFile": "/home/clawd/.openclaw/extensions/bmad-method/bmad-method/bmm/workflows/4-implementation/create-story/workflow.yaml",
-      "outputFile": "",
-      "startedAt": "2026-03-20T07:00:58.493Z"
-    }
-  ],
+  "activeWorkflows": [],
   "completedWorkflows": [
     {
       "id": "create-product-brief",
@@ -83,6 +71,18 @@
       "agentId": "dev",
       "outputFile": "",
       "completedAt": "2026-03-20T07:00:47.357Z"
+    },
+    {
+      "id": "create-story",
+      "agentId": "sm",
+      "outputFile": "",
+      "completedAt": "2026-03-20T07:31:22.563Z"
+    },
+    {
+      "id": "dev-story",
+      "agentId": "dev",
+      "outputFile": "/home/clawd/projects/personal-bookmarks-api/_bmad-output/implementation-artifacts/dev-story-log.md",
+      "completedAt": "2026-03-20T07:35:11.425Z"
     }
   ]
 }

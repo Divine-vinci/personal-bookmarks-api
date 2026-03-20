@@ -1,0 +1,10 @@
+node_modules
+dist
+data
+.git
+.gitignore
+test
+*.md
+.env
+.env.example
+_bmad-output

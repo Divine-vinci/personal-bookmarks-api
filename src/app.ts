@@ -8,6 +8,7 @@ import { authMiddleware } from './middleware/auth-middleware.js';
 import { errorHandler, notFoundHandler } from './middleware/error-middleware.js';
 import { loggerMiddleware } from './middleware/logger-middleware.js';
 import { createAuthRoutes } from './routes/auth-routes.js';
+import { createBookmarkRoutes } from './routes/bookmark-routes.js';
 import { createHealthRoutes } from './routes/health-routes.js';
 
 export const createApp = (appConfig: AppConfig = config) => {
@@ -27,7 +28,7 @@ export const createApp = (appConfig: AppConfig = config) => {
 
   app.route('/api/health', createHealthRoutes());
   app.route('/api/auth', createAuthRoutes());
-  app.route('/api/bookmarks', new Hono());
+  app.route('/api/bookmarks', createBookmarkRoutes());
   app.route('/api/tags', new Hono());
 
   return app;

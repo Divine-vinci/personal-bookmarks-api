@@ -5,15 +5,15 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 1.3 API Key Authentication (code-review timed out)
+- Current story: Story 1.3 API Key Authentication (DONE)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll found no transcript output for `code-review` session `agent:claude:acp:e64e8f9c-e5ca-4c34-9254-a0faa92594dd` after >30 minutes; marked timed out and queued GPT-5.4 fallback.
-- Next step: Fallback: start GPT-5.4 for code-review on Story 1.3 API Key Authentication.
+- Last action: Completed GPT-5.4 fallback code review for Story 1.3, validated auth wiring and edge cases, and confirmed build/tests passing.
+- Next step: Start story 1.4: Health Check Endpoint via Phase 4 story loop.
 
-## Active Code Review Session
+## Previous Code Review Session
 - acp_session_key: agent:claude:acp:e64e8f9c-e5ca-4c34-9254-a0faa92594dd
 - acp_workflow: code-review
-- acp_status: timed_out
+- acp_status: timed_out (fallback review completed locally)
 - acp_started_at: 2026-03-20T09:07:00Z
 
 ## Previous Create Story Session
@@ -30,7 +30,7 @@
 ## Stories (populated after sprint-planning from sprint-status.yaml)
 - [x] Story 1.1: Initialize Project and Development Environment (commit: 3a09389)
 - [x] Story 1.2: Database Setup and Migration System (commit: be853ae)
-- [ ] Story 1.3: API Key Authentication
+- [x] Story 1.3: API Key Authentication (commit: af1c267)
 - [ ] Story 1.4: Health Check Endpoint
 - [ ] Story 1.5: Error Handling and Input Validation Framework
 - [ ] Story 2.1: Create Bookmark
@@ -60,6 +60,8 @@
 - [x] Story 1.2 loop complete (commit: be853ae)
 - [x] create-story — Story 1.3 (commit: 0b5b8f5)
 - [x] dev-story — Story 1.3 (commit: 466cdc7)
+- [x] code-review — Story 1.3 (fallback complete; review fixes in commit: af1c267)
+- [x] Story 1.3 loop complete (commit: af1c267)
 
 ## Blockers
 - None

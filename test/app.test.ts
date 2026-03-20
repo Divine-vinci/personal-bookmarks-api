@@ -11,7 +11,7 @@ describe('createApp', () => {
       } as NodeJS.ProcessEnv),
     );
 
-    const response = await app.request('/bookmarks', {
+    const response = await app.request('/api/bookmarks', {
       headers: {
         Origin: 'http://localhost:3001',
       },
@@ -27,7 +27,7 @@ describe('createApp', () => {
       } as NodeJS.ProcessEnv),
     );
 
-    const response = await app.request('/bookmarks', {
+    const response = await app.request('/api/bookmarks', {
       headers: {
         Origin: 'https://my-dashboard.com',
       },
@@ -43,12 +43,37 @@ describe('createApp', () => {
       } as NodeJS.ProcessEnv),
     );
 
-    const response = await app.request('/bookmarks', {
+    const response = await app.request('/api/bookmarks', {
       headers: {
         Origin: 'https://evil-site.com',
       },
     });
 
     expect(response.headers.get('access-control-allow-origin')).toBeNull();
+  });
+
+  it('protects bookmark routes with auth middleware', async () => {
+    const app = createApp();
+
+    const response = await app.request('/api/bookmarks');
+
+    expect(response.status).toBe(401);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        code: 'unauthorized',
+        message: 'Invalid or missing API key',
+      },
+    });
+  });
+
+  it('keeps the health route public', async () => {
+    const app = createApp();
+
+    const response = await app.request('/api/health');
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      status: 'ok',
+    });
   });
 });

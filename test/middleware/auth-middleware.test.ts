@@ -70,6 +70,24 @@ describe('authMiddleware', () => {
     });
   });
 
+  it('rejects requests with a malformed authorization header', async () => {
+    const app = createTestApp();
+
+    const response = await app.request('/api/protected', {
+      headers: {
+        Authorization: 'Token valid-api-key',
+      },
+    });
+
+    expect(response.status).toBe(401);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        code: 'unauthorized',
+        message: 'Invalid or missing API key',
+      },
+    });
+  });
+
   it('rejects requests with an invalid bearer token', async () => {
     const app = createTestApp();
     setApiKeyHash(createHash('sha256').update('valid-api-key').digest('hex'));

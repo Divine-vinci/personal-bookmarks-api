@@ -37,4 +37,4 @@ development_status:
 
   # Epic 5: Production Deployment
   epic-5: backlog
-  5-1-docker-containerization: backlog
+  5-1-docker-containerization: ready-for-dev

@@ -1,0 +1,14 @@
+{
+  "projectName": "personal-bookmarks-api",
+  "projectPath": "/home/clawd/projects/personal-bookmarks-api",
+  "createdAt": "2026-03-20T01:30:49.520Z",
+  "currentPhase": "analysis",
+  "activeWorkflows": [],
+  "completedWorkflows": [
+    {
+      "id": "create-product-brief",
+      "status": "completed",
+      "completedAt": "2026-03-20T01:40:00.000Z"
+    }
+  ]
+}

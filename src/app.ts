@@ -9,6 +9,7 @@ import { errorHandler, notFoundHandler } from './middleware/error-middleware.js'
 import { loggerMiddleware } from './middleware/logger-middleware.js';
 import { createAuthRoutes } from './routes/auth-routes.js';
 import { createBookmarkRoutes } from './routes/bookmark-routes.js';
+import { createExportRoutes } from './routes/export-routes.js';
 import { createHealthRoutes } from './routes/health-routes.js';
 import { createImportRoutes } from './routes/import-routes.js';
 import { createTagRoutes } from './routes/tag-routes.js';
@@ -44,6 +45,7 @@ export const createApp = (appConfig: AppConfig = config) => {
   app.route('/api/bookmarks', createBookmarkRoutes());
   app.route('/api/import', createImportRoutes());
   app.route('/api/tags', createTagRoutes());
+  app.route('/api/export', createExportRoutes());
 
   return app;
 };

@@ -41,3 +41,11 @@
 - `bmad_init_project` confirmed existing project initialization at `/home/clawd/projects/personal-bookmarks-api`.
 - `bmad_load_step` returned final-step state for workflow `dev-story`.
 - No additional implementation step content was exposed in this session; proceeding to workflow finalization per BMAD instruction.
+
+
+## Story 2.2 Implementation Complete
+- Implemented AC #1-#7 in `src/db/repositories/bookmark-repository.ts`, `src/routes/bookmark-routes.ts`, and `src/schemas/common-schemas.ts`.
+- Added regression coverage in `test/routes/bookmark-routes.test.ts` and `test/schemas/common-schemas.test.ts`.
+- Updated `_bmad-output/implementation-artifacts/2-2-get-and-list-bookmarks.md` to `Status: review` with all tasks checked, file list, completion notes, and change log.
+- Updated `_bmad-output/implementation-artifacts/sprint-status.yaml`: `2-2-get-and-list-bookmarks: review`.
+- Validation passed: `npm run build && npm test` (91/91).

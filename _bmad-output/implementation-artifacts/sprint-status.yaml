@@ -20,8 +20,8 @@ development_status:
   # Epic 2: Bookmark Management
   epic-2: in-progress
   2-1-create-bookmark: done
-  2-2-get-and-list-bookmarks: ready-for-dev
-  2-3-update-bookmark: backlog
+  2-2-get-and-list-bookmarks: review
+  2-3-update-bookmark: ready-for-dev
   2-4-delete-bookmark: backlog
 
   # Epic 3: Search, Filtering & Tag Management

@@ -19,6 +19,13 @@ const authorizedJsonRequest = (app: ReturnType<typeof createApp>, body: unknown)
   body: JSON.stringify(body),
 });
 
+const authorizedGetRequest = (app: ReturnType<typeof createApp>, path: string) => app.request(path, {
+  method: 'GET',
+  headers: {
+    authorization: `Bearer ${API_KEY}`,
+  },
+});
+
 describe('bookmark routes', () => {
   let manager: DatabaseManager;
 
@@ -289,5 +296,296 @@ describe('bookmark routes', () => {
     expect(omittedDescriptionResponse.status).toBe(201);
     await expect(nullDescriptionResponse.json()).resolves.toMatchObject({ description: null });
     await expect(omittedDescriptionResponse.json()).resolves.toMatchObject({ description: null });
+  });
+
+  it('returns 200 with the complete bookmark object including tags for GET /:id', async () => {
+    const app = createApp();
+
+    const createResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/get-by-id',
+      title: 'Get by id',
+      description: 'Fetch me',
+      tags: ['rust', 'async'],
+    });
+    const created = await createResponse.json() as { id: number };
+
+    const response = await authorizedGetRequest(app, `/api/bookmarks/${created.id}`);
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      id: created.id,
+      url: 'https://example.com/get-by-id',
+      title: 'Get by id',
+      description: 'Fetch me',
+      tags: ['async', 'rust'],
+    });
+  });
+
+  it('returns 404 for a non-existent bookmark ID', async () => {
+    const app = createApp();
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks/999');
+
+    expect(response.status).toBe(404);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        code: 'not_found',
+        message: 'Bookmark not found',
+      },
+    });
+  });
+
+  it('returns 422 for a non-numeric bookmark ID', async () => {
+    const app = createApp();
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks/not-a-number');
+
+    expect(response.status).toBe(422);
+    const body = await response.json() as { error: { code: string; details: Array<{ field: string; message: string }> } };
+    expect(body.error.code).toBe('validation_error');
+    expect(body.error.details.some((detail) => detail.field === 'id')).toBe(true);
+  });
+
+  it('returns 401 for unauthenticated GET requests', async () => {
+    const app = createApp();
+
+    const listResponse = await app.request('/api/bookmarks');
+    const singleResponse = await app.request('/api/bookmarks/1');
+
+    expect(listResponse.status).toBe(401);
+    expect(singleResponse.status).toBe(401);
+  });
+
+  it('returns paginated data and total for GET /api/bookmarks', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/list-one',
+      title: 'List one',
+      tags: ['alpha'],
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/list-two',
+      title: 'List two',
+      tags: ['beta', 'gamma'],
+    });
+
+    const db = getDatabase();
+    db.prepare('UPDATE bookmarks SET created_at = ?, updated_at = ? WHERE url = ?').run(
+      '2026-03-20T12:00:00.000Z',
+      '2026-03-20T12:00:00.000Z',
+      'https://example.com/list-one',
+    );
+    db.prepare('UPDATE bookmarks SET created_at = ?, updated_at = ? WHERE url = ?').run(
+      '2026-03-20T12:01:00.000Z',
+      '2026-03-20T12:01:00.000Z',
+      'https://example.com/list-two',
+    );
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as {
+      data: Array<{ title: string; tags: string[] }>;
+      total: number;
+    };
+
+    expect(body.total).toBe(2);
+    expect(body.data).toHaveLength(2);
+    expect(body.data[0]?.tags).toEqual(['beta', 'gamma']);
+    expect(body.data[1]?.tags).toEqual(['alpha']);
+  });
+
+  it('applies default pagination with limit 20 and offset 0', async () => {
+    const app = createApp();
+
+    for (let index = 0; index < 25; index += 1) {
+      await authorizedJsonRequest(app, {
+        url: `https://example.com/default-page-${index}`,
+        title: `Bookmark ${index.toString().padStart(2, '0')}`,
+      });
+    }
+
+    const db = getDatabase();
+    for (let index = 0; index < 25; index += 1) {
+      db.prepare('UPDATE bookmarks SET created_at = ?, updated_at = ? WHERE url = ?').run(
+        `2026-03-20T12:${index.toString().padStart(2, '0')}:00.000Z`,
+        `2026-03-20T12:${index.toString().padStart(2, '0')}:00.000Z`,
+        `https://example.com/default-page-${index}`,
+      );
+    }
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }>; total: number };
+    expect(body.total).toBe(25);
+    expect(body.data).toHaveLength(20);
+    expect(body.data[0]?.title).toBe('Bookmark 24');
+    expect(body.data[19]?.title).toBe('Bookmark 05');
+  });
+
+  it('supports a custom limit query parameter', async () => {
+    const app = createApp();
+
+    for (let index = 0; index < 6; index += 1) {
+      await authorizedJsonRequest(app, {
+        url: `https://example.com/custom-limit-${index}`,
+        title: `Limit ${index}`,
+      });
+    }
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?limit=5');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: unknown[]; total: number };
+    expect(body.total).toBe(6);
+    expect(body.data).toHaveLength(5);
+  });
+
+  it('caps limit values above 100 at 100', async () => {
+    const app = createApp();
+
+    for (let index = 0; index < 105; index += 1) {
+      await authorizedJsonRequest(app, {
+        url: `https://example.com/capped-limit-${index}`,
+        title: `Cap ${index.toString().padStart(3, '0')}`,
+      });
+    }
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?limit=999');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: unknown[]; total: number };
+    expect(body.total).toBe(105);
+    expect(body.data).toHaveLength(100);
+  });
+
+  it('applies offset to skip records', async () => {
+    const app = createApp();
+
+    for (let index = 0; index < 5; index += 1) {
+      await authorizedJsonRequest(app, {
+        url: `https://example.com/offset-${index}`,
+        title: `Offset ${index}`,
+      });
+    }
+
+    const db = getDatabase();
+    for (let index = 0; index < 5; index += 1) {
+      db.prepare('UPDATE bookmarks SET created_at = ?, updated_at = ? WHERE url = ?').run(
+        `2026-03-20T13:0${index}:00.000Z`,
+        `2026-03-20T13:0${index}:00.000Z`,
+        `https://example.com/offset-${index}`,
+      );
+    }
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?offset=2');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }>; total: number };
+    expect(body.total).toBe(5);
+    expect(body.data).toHaveLength(3);
+    expect(body.data.map((bookmark) => bookmark.title)).toEqual(['Offset 2', 'Offset 1', 'Offset 0']);
+  });
+
+  it('sorts by created_at descending by default', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/sort-created-old',
+      title: 'Oldest',
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/sort-created-new',
+      title: 'Newest',
+    });
+
+    const db = getDatabase();
+    db.prepare('UPDATE bookmarks SET created_at = ?, updated_at = ? WHERE url = ?').run(
+      '2026-03-20T12:00:00.000Z',
+      '2026-03-20T12:00:00.000Z',
+      'https://example.com/sort-created-old',
+    );
+    db.prepare('UPDATE bookmarks SET created_at = ?, updated_at = ? WHERE url = ?').run(
+      '2026-03-20T12:01:00.000Z',
+      '2026-03-20T12:01:00.000Z',
+      'https://example.com/sort-created-new',
+    );
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }> };
+    expect(body.data.map((bookmark) => bookmark.title)).toEqual(['Newest', 'Oldest']);
+  });
+
+  it('sorts by title in ascending alphabetical order', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/sort-title-zeta',
+      title: 'Zeta',
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/sort-title-alpha',
+      title: 'Alpha',
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/sort-title-beta',
+      title: 'Beta',
+    });
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?sort=title');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }> };
+    expect(body.data.map((bookmark) => bookmark.title)).toEqual(['Alpha', 'Beta', 'Zeta']);
+  });
+
+  it('sorts by updated_at descending', async () => {
+    const app = createApp();
+
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/sort-updated-first',
+      title: 'First updated',
+    });
+    await authorizedJsonRequest(app, {
+      url: 'https://example.com/sort-updated-second',
+      title: 'Second updated',
+    });
+
+    const db = getDatabase();
+    db.prepare('UPDATE bookmarks SET updated_at = ? WHERE url = ?').run('2026-03-20T12:00:00.000Z', 'https://example.com/sort-updated-first');
+    db.prepare('UPDATE bookmarks SET updated_at = ? WHERE url = ?').run('2026-03-20T13:00:00.000Z', 'https://example.com/sort-updated-second');
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?sort=updated_at');
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as { data: Array<{ title: string }> };
+    expect(body.data.map((bookmark) => bookmark.title)).toEqual(['Second updated', 'First updated']);
+  });
+
+  it('returns 422 for an invalid sort value', async () => {
+    const app = createApp();
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?sort=invalid');
+
+    expect(response.status).toBe(422);
+    const body = await response.json() as { error: { code: string; details: Array<{ field: string; message: string }> } };
+    expect(body.error.code).toBe('validation_error');
+    expect(body.error.details.some((detail) => detail.field === 'sort')).toBe(true);
+  });
+
+  it('returns an empty dataset when no bookmarks exist', async () => {
+    const app = createApp();
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks');
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      data: [],
+      total: 0,
+    });
   });
 });

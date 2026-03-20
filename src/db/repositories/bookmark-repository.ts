@@ -1,5 +1,5 @@
 import type { CreateBookmarkInput } from '../../schemas/bookmark-schemas.js';
-import type { Bookmark } from '../../types.js';
+import type { Bookmark, PaginatedResponse } from '../../types.js';
 import { conflict, notFound } from '../../middleware/error-middleware.js';
 import { getDatabase } from '../database.js';
 
@@ -64,6 +64,40 @@ export const getBookmarkById = (id: number): Bookmark => {
   ).all(id) as Array<Pick<TagRow, 'name'>>;
 
   return mapBookmarkRow(bookmarkRow, tagRows.map((tag) => tag.name));
+};
+
+export const listBookmarks = (options: {
+  limit: number;
+  offset: number;
+  sort?: 'created_at' | 'updated_at' | 'title' | undefined;
+}): PaginatedResponse<Bookmark> => {
+  const db = getDatabase();
+  const sortColumn = options.sort ?? 'created_at';
+  const sortDirection = sortColumn === 'title' ? 'ASC' : 'DESC';
+
+  const rows = db.prepare(
+    `SELECT id, url, title, description, created_at, updated_at
+     FROM bookmarks
+     ORDER BY ${sortColumn} ${sortDirection}
+     LIMIT ? OFFSET ?`,
+  ).all(options.limit, options.offset) as BookmarkRow[];
+
+  const total = (db.prepare('SELECT COUNT(*) as count FROM bookmarks').get() as { count: number }).count;
+
+  const selectTagsByBookmarkId = db.prepare(
+    `SELECT t.name
+     FROM tags t
+     INNER JOIN bookmark_tags bt ON bt.tag_id = t.id
+     WHERE bt.bookmark_id = ?
+     ORDER BY t.name ASC`,
+  );
+
+  const bookmarks = rows.map((row) => mapBookmarkRow(
+    row,
+    (selectTagsByBookmarkId.all(row.id) as Array<Pick<TagRow, 'name'>>).map((tag) => tag.name),
+  ));
+
+  return { data: bookmarks, total };
 };
 
 export const createBookmark = (input: CreateBookmarkInput): Bookmark => {

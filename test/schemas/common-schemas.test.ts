@@ -34,10 +34,10 @@ describe('common schemas', () => {
     });
   });
 
-  it('rejects limits above 100', () => {
-    const result = paginationSchema.safeParse({ limit: 101 });
+  it('caps limits above 100', () => {
+    const result = paginationSchema.parse({ limit: 101 });
 
-    expect(result.success).toBe(false);
+    expect(result.limit).toBe(100);
   });
 
   it('rejects invalid sort values', () => {

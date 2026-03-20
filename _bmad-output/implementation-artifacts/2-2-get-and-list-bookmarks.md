@@ -1,6 +1,6 @@
 # Story 2.2: Get and List Bookmarks
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -26,43 +26,43 @@ So that I can access my saved links programmatically.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Add `listBookmarks` to bookmark repository (AC: #3, #4, #5, #6)
-  - [ ] Implement `listBookmarks(options: { limit, offset, sort })` in `src/db/repositories/bookmark-repository.ts`
-  - [ ] Query bookmarks with LIMIT/OFFSET, default sort `created_at DESC`
-  - [ ] Sort mapping: `created_at` → DESC, `updated_at` → DESC, `title` → ASC
-  - [ ] Return `{ data: Bookmark[], total: number }` using `PaginatedResponse<Bookmark>`
-  - [ ] Fetch tags for each bookmark in the result set (batch query or per-bookmark)
-  - [ ] Get total count with separate `SELECT COUNT(*) FROM bookmarks`
+- [x] Task 1: Add `listBookmarks` to bookmark repository (AC: #3, #4, #5, #6)
+  - [x] Implement `listBookmarks(options: { limit, offset, sort })` in `src/db/repositories/bookmark-repository.ts`
+  - [x] Query bookmarks with LIMIT/OFFSET, default sort `created_at DESC`
+  - [x] Sort mapping: `created_at` → DESC, `updated_at` → DESC, `title` → ASC
+  - [x] Return `{ data: Bookmark[], total: number }` using `PaginatedResponse<Bookmark>`
+  - [x] Fetch tags for each bookmark in the result set (batch query or per-bookmark)
+  - [x] Get total count with separate `SELECT COUNT(*) FROM bookmarks`
 
-- [ ] Task 2: Add GET /:id and GET / route handlers (AC: #1, #2, #3, #7)
-  - [ ] Add `GET /:id` handler in `src/routes/bookmark-routes.ts`
+- [x] Task 2: Add GET /:id and GET / route handlers (AC: #1, #2, #3, #7)
+  - [x] Add `GET /:id` handler in `src/routes/bookmark-routes.ts`
     - Validate `:id` param with `zValidator('param', idParamSchema)`
     - Call existing `getBookmarkById(id)` — already implemented
     - If null, throw `notFound('Bookmark not found')`
     - Return 200 with bookmark object
-  - [ ] Add `GET /` handler in `src/routes/bookmark-routes.ts`
+  - [x] Add `GET /` handler in `src/routes/bookmark-routes.ts`
     - Validate query params with `zValidator('query', paginationSchema)` — schema already exists in `common-schemas.ts`
     - Call `listBookmarks(options)`
     - Return 200 with `{ data, total }`
 
-- [ ] Task 3: Write tests (AC: #1-#7)
-  - [ ] Create test cases in `test/routes/bookmark-routes.test.ts` (add to existing file)
-  - [ ] GET /:id — 200 with complete bookmark object including tags
-  - [ ] GET /:id — 404 for non-existent ID
-  - [ ] GET /:id — 400/422 for non-numeric ID
-  - [ ] GET / — 200 with `{ data, total }` format
-  - [ ] GET / — default pagination (limit 20, offset 0)
-  - [ ] GET / — custom limit (e.g., `?limit=5`)
-  - [ ] GET / — limit capped at 100
-  - [ ] GET / — offset skips records
-  - [ ] GET / — default sort is `created_at` descending (newest first)
-  - [ ] GET / — sort by `title` (ascending alphabetical)
-  - [ ] GET / — sort by `updated_at` (descending)
-  - [ ] GET / — invalid sort value returns 422
-  - [ ] GET / — empty database returns `{ data: [], total: 0 }`
-  - [ ] GET / — bookmarks include tags arrays
-  - [ ] Both endpoints require authentication (401 without key)
-  - [ ] All existing tests (77) must still pass
+- [x] Task 3: Write tests (AC: #1-#7)
+  - [x] Create test cases in `test/routes/bookmark-routes.test.ts` (add to existing file)
+  - [x] GET /:id — 200 with complete bookmark object including tags
+  - [x] GET /:id — 404 for non-existent ID
+  - [x] GET /:id — 400/422 for non-numeric ID
+  - [x] GET / — 200 with `{ data, total }` format
+  - [x] GET / — default pagination (limit 20, offset 0)
+  - [x] GET / — custom limit (e.g., `?limit=5`)
+  - [x] GET / — limit capped at 100
+  - [x] GET / — offset skips records
+  - [x] GET / — default sort is `created_at` descending (newest first)
+  - [x] GET / — sort by `title` (ascending alphabetical)
+  - [x] GET / — sort by `updated_at` (descending)
+  - [x] GET / — invalid sort value returns 422
+  - [x] GET / — empty database returns `{ data: [], total: 0 }`
+  - [x] GET / — bookmarks include tags arrays
+  - [x] Both endpoints require authentication (401 without key)
+  - [x] All existing tests (77) must still pass
 
 ## Dev Notes
 
@@ -262,8 +262,27 @@ describe('GET /api/bookmarks', () => {
 
 ### Agent Model Used
 
+GPT-5.4
+
 ### Debug Log References
+
+- `npm run build && npm test`
 
 ### Completion Notes List
 
+- Added `listBookmarks` pagination + sort + total-count repository flow with tag hydration.
+- Added authenticated `GET /api/bookmarks` and `GET /api/bookmarks/:id` handlers using existing schemas.
+- Updated `paginationSchema` to cap `limit` at 100 per AC #4 while preserving invalid-sort validation.
+- Added 14 route/schema tests for list/get flows; full suite green at 91/91.
+
 ### File List
+
+- `src/db/repositories/bookmark-repository.ts` — added `listBookmarks()` for paginated bookmark retrieval with per-bookmark tag loading.
+- `src/routes/bookmark-routes.ts` — added authenticated `GET /` and `GET /:id` handlers.
+- `src/schemas/common-schemas.ts` — capped `limit` to 100 via schema transform.
+- `test/routes/bookmark-routes.test.ts` — added GET route coverage for AC #1-#7.
+- `test/schemas/common-schemas.test.ts` — updated limit-cap schema coverage.
+
+## Change Log
+
+- 2026-03-20 — Implemented Story 2.2 GET/list bookmark retrieval, pagination capping, and regression coverage; story moved to review.

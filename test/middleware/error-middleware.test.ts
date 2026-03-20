@@ -6,7 +6,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
 import {
+  conflict,
   errorHandler,
+  invalidRequest,
   invalidUrl,
   notFound,
   notFoundHandler,
@@ -77,6 +79,14 @@ const createTestApp = () => {
     throw invalidUrl();
   });
 
+  app.get('/conflict', () => {
+    throw conflict('URL already exists');
+  });
+
+  app.get('/bad-request', () => {
+    throw invalidRequest('Missing required field');
+  });
+
   app.get('/boom', () => {
     throw new Error('kaboom stack details');
   });
@@ -120,7 +130,7 @@ describe('error middleware', () => {
     await expect(response.json()).resolves.toEqual({
       error: {
         code: 'invalid_request',
-        message: 'Invalid request body',
+        message: 'Request body exceeds 1MB limit',
       },
     });
   });
@@ -215,6 +225,34 @@ describe('error middleware', () => {
     });
     expect(JSON.stringify(body)).not.toContain('kaboom');
     expect(loggerError).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns duplicate_url for conflict errors', async () => {
+    const app = createTestApp();
+
+    const response = await app.request('/conflict');
+
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        code: 'duplicate_url',
+        message: 'URL already exists',
+      },
+    });
+  });
+
+  it('returns invalid_request for bad request errors', async () => {
+    const app = createTestApp();
+
+    const response = await app.request('/bad-request');
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        code: 'invalid_request',
+        message: 'Missing required field',
+      },
+    });
   });
 
   it('always returns the standard error envelope', async () => {

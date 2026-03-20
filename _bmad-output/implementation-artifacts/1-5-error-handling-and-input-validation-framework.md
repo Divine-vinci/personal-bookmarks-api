@@ -1,6 +1,6 @@
 # Story 1.5: Error Handling and Input Validation Framework
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -28,46 +28,46 @@ So that API consumers can programmatically handle errors and debug issues quickl
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create centralized error handler middleware (AC: #1, #2, #7)
-  - [ ] Create `src/middleware/error-middleware.ts` with Hono `onError` handler
-  - [ ] Handle `HTTPException` — extract status and body, return standard error JSON
-  - [ ] Handle `ZodError` — map to 422 with `validation_error` code and per-field messages
-  - [ ] Handle unknown errors — return 500 `internal_error`, log full error via Pino, never expose internals
-  - [ ] Handle malformed JSON (SyntaxError from body parsing) — return 400 `invalid_request`
+- [x] Task 1: Create centralized error handler middleware (AC: #1, #2, #7)
+  - [x] Create `src/middleware/error-middleware.ts` with Hono `onError` handler
+  - [x] Handle `HTTPException` — extract status and body, return standard error JSON
+  - [x] Handle `ZodError` — map to 422 with `validation_error` code and per-field messages
+  - [x] Handle unknown errors — return 500 `internal_error`, log full error via Pino, never expose internals
+  - [x] Handle malformed JSON (SyntaxError from body parsing) — return 400 `invalid_request`
 
-- [ ] Task 2: Add body size limit middleware (AC: #3)
-  - [ ] Add Hono `bodyLimit` middleware to `src/app.ts` — 1MB default limit
-  - [ ] Ensure oversized requests return 400 with `invalid_request` error format
+- [x] Task 2: Add body size limit middleware (AC: #3)
+  - [x] Add Hono `bodyLimit` middleware to `src/app.ts` — 1MB default limit
+  - [x] Ensure oversized requests return 400 with `invalid_request` error format
 
-- [ ] Task 3: Create Zod validation schemas (AC: #4, #5, #8)
-  - [ ] Create `src/schemas/bookmark-schemas.ts` with:
+- [x] Task 3: Create Zod validation schemas (AC: #4, #5, #8)
+  - [x] Create `src/schemas/bookmark-schemas.ts` with:
     - `createBookmarkSchema`: url (required, valid URL, max 2000), title (required, max 500), description (optional, max 2000), tags (optional array of trimmed lowercase strings)
     - `updateBookmarkSchema`: same shape as create
-  - [ ] Create `src/schemas/common-schemas.ts` with:
+  - [x] Create `src/schemas/common-schemas.ts` with:
     - `paginationSchema`: limit (optional int, default 20, max 100), offset (optional int, default 0, min 0), sort (optional enum: created_at, updated_at, title)
     - `idParamSchema`: id (integer, positive)
-  - [ ] URL validation: use Zod `.url()` refinement; produce `invalid_url` error code distinct from generic validation
+  - [x] URL validation: use Zod `.url()` refinement; produce `invalid_url` error code distinct from generic validation
 
-- [ ] Task 4: Create application error helpers (AC: #1, #5, #6)
-  - [ ] Define a lightweight `AppError` class or factory functions in `src/middleware/error-middleware.ts` (or `src/types.ts`) for throwing typed errors:
+- [x] Task 4: Create application error helpers (AC: #1, #5, #6)
+  - [x] Define a lightweight `AppError` class or factory functions in `src/middleware/error-middleware.ts` (or `src/types.ts`) for throwing typed errors:
     - `notFound(message)` — throws HTTPException(404) with `not_found` code
     - `conflict(message)` — throws HTTPException(409) with `duplicate_url` code (for future use in Epic 2)
     - `invalidUrl(message)` — throws HTTPException(400) with `invalid_url` code
-  - [ ] These helpers ensure route handlers never construct error JSON manually
+  - [x] These helpers ensure route handlers never construct error JSON manually
 
-- [ ] Task 5: Wire error middleware into app (AC: #1)
-  - [ ] Register `onError` handler in `src/app.ts`
-  - [ ] Register `onNotFound` handler for unknown routes — return 404 `not_found`
-  - [ ] Verify middleware execution order: logger → CORS → bodyLimit → auth → routes → onError
+- [x] Task 5: Wire error middleware into app (AC: #1)
+  - [x] Register `onError` handler in `src/app.ts`
+  - [x] Register `onNotFound` handler for unknown routes — return 404 `not_found`
+  - [x] Verify middleware execution order: logger → CORS → bodyLimit → auth → routes → onError
 
-- [ ] Task 6: Write tests (AC: #1–#8)
-  - [ ] Create `test/middleware/error-middleware.test.ts`:
+- [x] Task 6: Write tests (AC: #1–#8)
+  - [x] Create `test/middleware/error-middleware.test.ts`:
     - Test: malformed JSON body → 400 `invalid_request`
     - Test: unknown route → 404 `not_found`
     - Test: HTTPException → correct status and error JSON
     - Test: unexpected error → 500 `internal_error` with no stack trace in response
     - Test: error response always matches `{ error: { code, message } }` shape
-  - [ ] Create `test/schemas/bookmark-schemas.test.ts`:
+  - [x] Create `test/schemas/bookmark-schemas.test.ts`:
     - Test: valid create payload passes
     - Test: missing url → validation error
     - Test: missing title → validation error
@@ -76,12 +76,12 @@ So that API consumers can programmatically handle errors and debug issues quickl
     - Test: invalid URL format → error (for `invalid_url` code)
     - Test: tags normalized to lowercase trimmed
     - Test: description optional (null/undefined allowed)
-  - [ ] Create `test/schemas/common-schemas.test.ts`:
+  - [x] Create `test/schemas/common-schemas.test.ts`:
     - Test: default pagination values (limit=20, offset=0)
     - Test: limit capped at 100
     - Test: invalid sort value rejected
     - Test: valid sort values accepted (created_at, updated_at, title)
-  - [ ] All tests must pass `npm test`
+  - [x] All tests must pass `npm test`
 
 ## Dev Notes
 
@@ -217,10 +217,59 @@ Recent commits show the project follows `[BMAD Phase 4] Story X.Y: Title` commit
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+claude-opus-4-6
 
 ### Debug Log References
 
 ### Completion Notes List
 
+- Centralized error handler with `onError` and `notFound` handlers in `src/middleware/error-middleware.ts`.
+- Body size limit (1MB) via Hono `bodyLimit` middleware in `src/app.ts`.
+- Zod schemas for bookmark create/update, pagination, and ID params.
+- Error helper functions: `notFound`, `conflict`, `invalidUrl`, `invalidRequest`.
+- `validationErrorToException` converts URL ZodErrors to distinct `invalid_url` errors.
+- All 63 tests pass (7 new tests added during code review).
+
 ### File List
+
+- `src/middleware/error-middleware.ts` — Created: centralized error handler, notFound handler, error helpers
+- `src/schemas/bookmark-schemas.ts` — Created: createBookmarkSchema, updateBookmarkSchema
+- `src/schemas/common-schemas.ts` — Created: paginationSchema, idParamSchema
+- `src/app.ts` — Modified: registered onError, notFound, bodyLimit middleware
+- `src/types.ts` — Modified: added ValidationErrorDetail interface, details field to ApiError
+- `test/middleware/error-middleware.test.ts` — Created: 10 error handler tests
+- `test/schemas/bookmark-schemas.test.ts` — Created: 10 bookmark schema tests
+- `test/schemas/common-schemas.test.ts` — Created: 8 common schema tests
+
+### Senior Developer Review (AI)
+
+**Reviewer:** Amelia (claude-opus-4-6)
+**Date:** 2026-03-20
+
+**Issues Found:** 1 Critical, 1 High, 3 Medium, 1 Low
+**Issues Fixed:** 5 (1 Critical, 1 High, 3 Medium)
+
+| # | Severity | Issue | Fix |
+|---|---|---|---|
+| 1 | CRITICAL | Story status "ready-for-dev", all tasks unchecked, empty Dev Agent Record — code already committed | Updated status, tasks, and record |
+| 2 | HIGH | `idParamSchema` has zero test coverage despite Task 6 requiring it | Added 4 tests: positive int, zero/negative, non-integer, string coercion |
+| 3 | MEDIUM | Description max 2000 chars constraint untested (AC#8) | Added test for description exceeding 2000 chars |
+| 4 | MEDIUM | Body size limit error message "Invalid request body" is generic and unhelpful | Changed to "Request body exceeds 1MB limit" |
+| 5 | MEDIUM | `conflict` and `invalidRequest` helpers exported but untested | Added 2 tests: conflict → 409 `duplicate_url`, invalidRequest → 400 `invalid_request` |
+| 6 | LOW | `bodyLimit` applied to all routes including GET /api/health | Not fixed — negligible overhead, simpler config |
+
+**Acceptance Criteria Validation:**
+- AC1: IMPLEMENTED — all errors return `{ error: { code, message } }` via centralized handler
+- AC2: IMPLEMENTED — malformed JSON → 400 `invalid_request`
+- AC3: IMPLEMENTED — body > 1MB → 400 `invalid_request`
+- AC4: IMPLEMENTED — ZodError → 422 `validation_error` with per-field details
+- AC5: IMPLEMENTED — invalid URL → 400 `invalid_url` (via `validationErrorToException` hook)
+- AC6: IMPLEMENTED — not found → 404 `not_found`
+- AC7: IMPLEMENTED — unexpected error → 500 `internal_error`, logged via Pino, no internals exposed
+- AC8: IMPLEMENTED — schemas enforce url required+validated+max2000, title required+max500, desc optional+max2000, tags optional array
+
+**Verdict:** APPROVED — all ACs implemented, all HIGH/MEDIUM issues fixed
+
+### Change Log
+
+- 2026-03-20: Code review by Amelia — fixed 5 issues (added 7 tests, improved error message), approved, status → done

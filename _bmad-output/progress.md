@@ -5,16 +5,22 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 1.5 Error Handling and Input Validation Framework (dev-story queued)
+- Current story: Story 1.5 Error Handling and Input Validation Framework (code-review running)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll detected completed `create-story` for Story 1.5, marked the workflow complete, and committed/pushed the story artifact as `f93019e`.
-- Next step: Start `dev-story` for Story 1.5 Error Handling and Input Validation Framework via GPT-5.4 subagent.
+- Last action: Heartbeat recovery committed Story 1.5 `dev-story` as `c85a0f2` and started `code-review` via ACP session `agent:claude:acp:bfe68edb-312d-4450-b61a-a129368033f4`.
+- Next step: Poll ACP session agent:claude:acp:bfe68edb-312d-4450-b61a-a129368033f4 for `code-review` completion.
 
 ## Active Create Story Session
 - acp_session_key: agent:claude:acp:3cd8759c-1ddd-4d15-9ed6-1b2dc3138134
 - acp_workflow: create-story
 - acp_status: completed
 - acp_started_at: 2026-03-20T11:44:00Z
+
+## Active Code Review Session
+- acp_session_key: agent:claude:acp:bfe68edb-312d-4450-b61a-a129368033f4
+- acp_workflow: code-review
+- acp_status: running
+- acp_started_at: 2026-03-20T12:16:00Z
 
 ## Previous Code Review Session
 - acp_session_key: agent:claude:acp:134e2d02-7318-4a56-a51c-eb17ed1d8528

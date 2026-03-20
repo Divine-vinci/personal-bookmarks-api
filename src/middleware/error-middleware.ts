@@ -144,7 +144,7 @@ export const errorHandler = (async (error: unknown, c) => {
 
   if (isHttpError(error)) {
     if (isBodyLimitError(error)) {
-      return c.json(createErrorResponse('invalid_request', 'Invalid request body'), 400);
+      return c.json(createErrorResponse('invalid_request', 'Request body exceeds 1MB limit'), 400);
     }
 
     const body = await parseHttpExceptionResponse(error);

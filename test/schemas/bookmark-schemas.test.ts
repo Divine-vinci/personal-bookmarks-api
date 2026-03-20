@@ -73,6 +73,17 @@ describe('bookmark schemas', () => {
     expect(result.tags).toEqual(['dev', 'tools']);
   });
 
+  it('rejects descriptions longer than 2000 characters', () => {
+    const result = createBookmarkSchema.safeParse({
+      url: 'https://example.com',
+      title: 'Example',
+      description: 'a'.repeat(2001),
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.some((issue) => issue.path[0] === 'description')).toBe(true);
+  });
+
   it('allows description to be omitted or null', () => {
     expect(createBookmarkSchema.safeParse({
       url: 'https://example.com',

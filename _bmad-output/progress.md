@@ -5,16 +5,17 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 2.1 Create Bookmark (dev-story running)
+- Current story: Story 2.1 Create Bookmark (code-review complete); Story 2.2 Get and List Bookmarks (create-story running)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: Polled ACP `create-story` for Story 2.1 to completion, committed/pushed BMAD artifacts as `4b3b367`, completed `create-story`, and spawned `dev-story` subagent `agent:main:subagent:9446eae2-0f1b-446b-8163-feab633a428d`.
-- Next step: Wait for subagent agent:main:subagent:9446eae2-0f1b-446b-8163-feab633a428d to finish `dev-story` for Story 2.1, then run `code-review`.
+- Last action: ACP poll detected completed code-review output for Story 2.1 and spawned create-story ACP session `agent:claude:acp:ff19bcee-b936-48cb-8005-08fba3d76305` for Story 2.2.
+- Next step: ACP session running — poll cron active
+- next_after_acp: Start story 2.2: Get and List Bookmarks — dev+prep parallel
 
 ## Active Create Story Session
-- acp_session_key: agent:claude:acp:3cd8759c-1ddd-4d15-9ed6-1b2dc3138134
+- acp_session_key: agent:claude:acp:ff19bcee-b936-48cb-8005-08fba3d76305
 - acp_workflow: create-story
-- acp_status: completed
-- acp_started_at: 2026-03-20T11:44:00Z
+- acp_status: running
+- acp_started_at: 2026-03-20T13:46:17Z
 
 ## Previous Create Story Session
 - acp_session_key: agent:claude:acp:b545526a-0a4d-4f57-936d-26ea1d50b55b
@@ -26,8 +27,14 @@
 ## Active Dev Session
 - subagent_session_key: agent:main:subagent:9446eae2-0f1b-446b-8163-feab633a428d
 - subagent_workflow: dev-story
-- subagent_status: running
+- subagent_status: completed (detected by heartbeat from finished transcript; recovery commit: 514f110)
 - subagent_started_at: 2026-03-20T12:31:00Z
+
+## Previous Code Review Session
+- acp_session_key: agent:claude:acp:7249ea0a-c525-40bf-9ac9-deab0a199048
+- acp_workflow: code-review
+- acp_status: completed (detected by ACP poll on 2026-03-20)
+- acp_started_at: 2026-03-20T13:00:00Z
 
 ## Previous Code Review Session
 - acp_session_key: agent:claude:acp:bfe68edb-312d-4450-b61a-a129368033f4
@@ -64,7 +71,7 @@
 - [x] Story 1.3: API Key Authentication (commit: af1c267)
 - [x] Story 1.4: Health Check Endpoint (commit: ff1d3a6)
 - [x] Story 1.5: Error Handling and Input Validation Framework (commit: cc441d3)
-- [ ] Story 2.1: Create Bookmark
+- [x] Story 2.1: Create Bookmark (commit: pending ACP poll commit)
 - [ ] Story 2.2: Get and List Bookmarks
 - [ ] Story 2.3: Update Bookmark
 - [ ] Story 2.4: Delete Bookmark
@@ -113,6 +120,10 @@
 - [x] dev-story — Story 1.3 (commit: 466cdc7)
 - [x] code-review — Story 1.3 (fallback complete; review fixes in commit: af1c267)
 - [x] Story 1.3 loop complete (commit: af1c267)
+- [x] create-story — Story 2.1
+- [x] dev-story — Story 2.1
+- [x] code-review — Story 2.1
+- [x] Story 2.1 loop complete (commit: pending ACP poll commit)
 
 ## Blockers
 - None

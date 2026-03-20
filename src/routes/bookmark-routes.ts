@@ -1,5 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
+import type { ZodError } from 'zod';
 
 import { createBookmark } from '../db/repositories/bookmark-repository.js';
 import { validationErrorToException } from '../middleware/error-middleware.js';
@@ -12,7 +13,7 @@ export const createBookmarkRoutes = () => {
     '/',
     zValidator('json', createBookmarkSchema, (result) => {
       if (!result.success) {
-        throw validationErrorToException(result.error as never);
+        throw validationErrorToException(result.error as ZodError);
       }
     }),
     (c) => {

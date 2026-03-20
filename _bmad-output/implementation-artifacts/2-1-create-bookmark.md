@@ -1,6 +1,6 @@
 # Story 2.1: Create Bookmark
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -26,34 +26,34 @@ So that I can programmatically save and organize links.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create bookmark repository (AC: #1, #2, #3, #4, #5, #6)
-  - [ ] Create `src/db/repositories/bookmark-repository.ts`
-  - [ ] Implement `createBookmark(input)` — INSERT into bookmarks, handle tags, return full bookmark with tags array
-  - [ ] Implement `getBookmarkById(id)` — SELECT with LEFT JOIN for tags (needed for returning created bookmark)
-  - [ ] Handle tag upsert: INSERT OR IGNORE into tags, then INSERT into bookmark_tags
-  - [ ] Catch UNIQUE constraint violation on `bookmarks.url` → throw `conflict()` error
-  - [ ] Wrap bookmark + tag inserts in a transaction for atomicity
-- [ ] Task 2: Create bookmark route handler (AC: #1, #7)
-  - [ ] Create `src/routes/bookmark-routes.ts` with `createBookmarkRoutes()` factory
-  - [ ] POST `/` handler: validate with `zValidator('json', createBookmarkSchema)`, call repository, return 201
-  - [ ] Wire custom validation hook for `invalid_url` error distinction (same pattern as Story 1.5)
-- [ ] Task 3: Wire route in app.ts (AC: #1)
-  - [ ] Verify `createBookmarkRoutes()` is mounted at `/api/bookmarks` in `src/app.ts`
-- [ ] Task 4: Write tests (AC: #1-#7)
-  - [ ] Create `test/routes/bookmark-routes.test.ts`
-  - [ ] Test: valid bookmark creation → 201 with complete object
-  - [ ] Test: bookmark with tags → tags created and associated
-  - [ ] Test: bookmark with existing tags → reused, not duplicated
-  - [ ] Test: empty tags array → returns `[]`
-  - [ ] Test: no tags field → returns `[]`
-  - [ ] Test: mixed case/whitespace tags → stored lowercase-trimmed
-  - [ ] Test: duplicate URL → 409 `duplicate_url`
-  - [ ] Test: missing url → 422 validation error
-  - [ ] Test: missing title → 422 validation error
-  - [ ] Test: invalid URL format → 400 `invalid_url`
-  - [ ] Test: description is optional (null/omitted both work)
-  - [ ] Test: response includes id, url, title, description, tags, created_at, updated_at
-  - [ ] All 63 existing tests must still pass
+- [x] Task 1: Create bookmark repository (AC: #1, #2, #3, #4, #5, #6)
+  - [x] Create `src/db/repositories/bookmark-repository.ts`
+  - [x] Implement `createBookmark(input)` — INSERT into bookmarks, handle tags, return full bookmark with tags array
+  - [x] Implement `getBookmarkById(id)` — SELECT with LEFT JOIN for tags (needed for returning created bookmark)
+  - [x] Handle tag upsert: INSERT OR IGNORE into tags, then INSERT into bookmark_tags
+  - [x] Catch UNIQUE constraint violation on `bookmarks.url` → throw `conflict()` error
+  - [x] Wrap bookmark + tag inserts in a transaction for atomicity
+- [x] Task 2: Create bookmark route handler (AC: #1, #7)
+  - [x] Create `src/routes/bookmark-routes.ts` with `createBookmarkRoutes()` factory
+  - [x] POST `/` handler: validate with `zValidator('json', createBookmarkSchema)`, call repository, return 201
+  - [x] Wire custom validation hook for `invalid_url` error distinction (same pattern as Story 1.5)
+- [x] Task 3: Wire route in app.ts (AC: #1)
+  - [x] Verify `createBookmarkRoutes()` is mounted at `/api/bookmarks` in `src/app.ts`
+- [x] Task 4: Write tests (AC: #1-#7)
+  - [x] Create `test/routes/bookmark-routes.test.ts`
+  - [x] Test: valid bookmark creation → 201 with complete object
+  - [x] Test: bookmark with tags → tags created and associated
+  - [x] Test: bookmark with existing tags → reused, not duplicated
+  - [x] Test: empty tags array → returns `[]`
+  - [x] Test: no tags field → returns `[]`
+  - [x] Test: mixed case/whitespace tags → stored lowercase-trimmed
+  - [x] Test: duplicate URL → 409 `duplicate_url`
+  - [x] Test: missing url → 422 validation error
+  - [x] Test: missing title → 422 validation error
+  - [x] Test: invalid URL format → 400 `invalid_url`
+  - [x] Test: description is optional (null/omitted both work)
+  - [x] Test: response includes id, url, title, description, tags, created_at, updated_at
+  - [x] All 63 existing tests must still pass
 
 ## Dev Notes
 
@@ -286,10 +286,36 @@ describe('POST /api/bookmarks', () => {
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude Opus 4.6
 
 ### Debug Log References
 
+N/A
+
 ### Completion Notes List
 
+- All 7 ACs implemented and verified with tests
+- Code review fixed: `as never` type cast → proper `ZodError` type in bookmark-routes.ts
+- Code review added: 3 missing tests (duplicate tag dedup, 401 unauth, exact response shape)
+- All 77 tests pass (63 existing + 14 new bookmark tests)
+
 ### File List
+
+- `src/db/repositories/bookmark-repository.ts` — NEW: createBookmark, getBookmarkById with transaction-based tag upsert
+- `src/routes/bookmark-routes.ts` — MODIFIED: POST / handler with zValidator and createBookmarkSchema
+- `src/app.ts` — MODIFIED: wired createBookmarkRoutes at /api/bookmarks
+- `test/routes/bookmark-routes.test.ts` — NEW: 14 tests covering all ACs + edge cases
+
+### Senior Developer Review (AI)
+
+**Reviewer:** Amelia (Code Review Agent) on 2026-03-20
+**Verdict:** APPROVED with fixes applied
+
+**Issues Found & Fixed:**
+1. CRITICAL: Story tasks unchecked but implemented — marked all [x]
+2. CRITICAL: Story status was "ready-for-dev" — updated to "done"
+3. CRITICAL: Dev Agent Record empty — filled in file list and notes
+4. HIGH: `as never` type cast in bookmark-routes.ts:15 — fixed to `as ZodError`
+5. HIGH: Missing test for duplicate tags in input — added test
+6. MEDIUM: Missing test for unauthenticated access — added 401 test
+7. MEDIUM: Missing test for exact response shape — added field verification test

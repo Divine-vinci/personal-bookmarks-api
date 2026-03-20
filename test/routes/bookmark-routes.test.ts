@@ -228,6 +228,50 @@ describe('bookmark routes', () => {
     });
   });
 
+  it('deduplicates tags in input', async () => {
+    const app = createApp();
+
+    const response = await authorizedJsonRequest(app, {
+      url: 'https://example.com/dedup-tags',
+      title: 'Dedup tags',
+      tags: ['rust', 'rust', 'async'],
+    });
+
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toMatchObject({
+      tags: ['async', 'rust'],
+    });
+
+    const db = getDatabase();
+    const tagCount = db.prepare('SELECT COUNT(*) as count FROM tags WHERE name = ?').get('rust') as { count: number };
+    expect(tagCount.count).toBe(1);
+  });
+
+  it('returns 401 for unauthenticated request', async () => {
+    const app = createApp();
+
+    const response = await app.request('/api/bookmarks', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ url: 'https://example.com', title: 'Test' }),
+    });
+
+    expect(response.status).toBe(401);
+  });
+
+  it('returns response with exactly the expected fields', async () => {
+    const app = createApp();
+
+    const response = await authorizedJsonRequest(app, {
+      url: 'https://example.com/exact-fields',
+      title: 'Exact fields',
+    });
+
+    expect(response.status).toBe(201);
+    const body = await response.json() as Record<string, unknown>;
+    expect(Object.keys(body).sort()).toEqual(['created_at', 'description', 'id', 'tags', 'title', 'updated_at', 'url']);
+  });
+
   it('supports description as null and when omitted', async () => {
     const app = createApp();
 

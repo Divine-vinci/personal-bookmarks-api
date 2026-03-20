@@ -30,3 +30,9 @@ export interface PaginatedResponse<T> {
   data: T[];
   total: number;
 }
+
+export interface ImportResult {
+  imported: number;
+  failed: number;
+  errors: string[];
+}

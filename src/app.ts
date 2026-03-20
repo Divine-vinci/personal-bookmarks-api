@@ -10,7 +10,12 @@ import { loggerMiddleware } from './middleware/logger-middleware.js';
 import { createAuthRoutes } from './routes/auth-routes.js';
 import { createBookmarkRoutes } from './routes/bookmark-routes.js';
 import { createHealthRoutes } from './routes/health-routes.js';
+import { createImportRoutes } from './routes/import-routes.js';
 import { createTagRoutes } from './routes/tag-routes.js';
+
+const DEFAULT_BODY_LIMIT_BYTES = 1024 * 1024;
+const IMPORT_PATH = '/api/import';
+const defaultBodyLimit = bodyLimit({ maxSize: DEFAULT_BODY_LIMIT_BYTES });
 
 export const createApp = (appConfig: AppConfig = config) => {
   const app = new Hono();
@@ -21,7 +26,14 @@ export const createApp = (appConfig: AppConfig = config) => {
     app.use('*', cors({ origin: appConfig.corsOrigins }));
   }
 
-  app.use('*', bodyLimit({ maxSize: 1024 * 1024 }));
+  app.use('*', async (c, next) => {
+    if (c.req.path === IMPORT_PATH) {
+      await next();
+      return;
+    }
+
+    await defaultBodyLimit(c, next);
+  });
   app.use('*', authMiddleware());
 
   app.onError(errorHandler);
@@ -30,6 +42,7 @@ export const createApp = (appConfig: AppConfig = config) => {
   app.route('/api/health', createHealthRoutes());
   app.route('/api/auth', createAuthRoutes());
   app.route('/api/bookmarks', createBookmarkRoutes());
+  app.route('/api/import', createImportRoutes());
   app.route('/api/tags', createTagRoutes());
 
   return app;

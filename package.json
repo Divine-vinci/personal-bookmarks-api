@@ -1,0 +1,45 @@
+{
+  "name": "personal-bookmarks-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Divine-vinci/personal-bookmarks-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Divine-vinci/personal-bookmarks-api/issues"
+  },
+  "homepage": "https://github.com/Divine-vinci/personal-bookmarks-api#readme",
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^25.5.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "hono": "^4.12.8",
+    "@hono/node-server": "^1.19.4",
+    "@hono/zod-validator": "^0.7.4",
+    "better-sqlite3": "^12.8.0",
+    "zod": "^4.3.6",
+    "pino": "^10.3.1",
+    "pino-http": "^11.0.0"
+  }
+}

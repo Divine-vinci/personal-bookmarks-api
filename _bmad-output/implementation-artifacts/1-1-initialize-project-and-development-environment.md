@@ -1,6 +1,6 @@
 # Story 1.1: Initialize Project and Development Environment
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -22,43 +22,43 @@ So that I have a working development environment with all dependencies, TypeScri
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Initialize npm project and install dependencies (AC: #1)
-  - [ ] Run `npm init -y` in project root
-  - [ ] Install production deps: `hono @hono/node-server better-sqlite3 zod @hono/zod-validator pino pino-http`
-  - [ ] Install dev deps: `typescript @types/better-sqlite3 @types/node tsx vitest`
-  - [ ] Configure package.json scripts: `dev`, `build`, `start`, `test`
-- [ ] Task 2: Configure TypeScript (AC: #1)
-  - [ ] Run `npx tsc --init` and configure strict mode
-  - [ ] Set `outDir: "dist"`, `rootDir: "src"`, `target: "ES2022"`, `module: "NodeNext"`, `moduleResolution: "NodeNext"`
-  - [ ] Enable `declaration`, `strict`, `esModuleInterop`, `skipLibCheck`
-- [ ] Task 3: Create project directory structure (AC: #1)
-  - [ ] Create `src/routes/`, `src/middleware/`, `src/schemas/`, `src/db/`, `src/db/migrations/`, `src/db/repositories/`, `src/services/`
-  - [ ] Create `test/routes/`, `test/db/`, `test/services/`
-  - [ ] Create `data/` with `.gitkeep`
-- [ ] Task 4: Implement config module (AC: #3, #4, #5)
-  - [ ] Create `src/config.ts` reading PORT, DATA_DIR, CORS_ORIGINS, LOG_LEVEL, NODE_ENV from env
-  - [ ] Apply defaults: PORT=3000, DATA_DIR=./data, LOG_LEVEL=info, NODE_ENV=development
-  - [ ] Parse CORS_ORIGINS as comma-separated string to string array
-- [ ] Task 5: Implement logger middleware (AC: #2)
-  - [ ] Create `src/middleware/logger-middleware.ts` using Pino + pino-http
-  - [ ] Configure Pino with LOG_LEVEL from config, JSON output to stdout
-- [ ] Task 6: Implement Hono app factory (AC: #2, #4)
-  - [ ] Create `src/app.ts` — Hono app factory exported for testing
-  - [ ] Register CORS middleware using `hono/cors` with origins from config
-  - [ ] Register logger middleware
-  - [ ] Add placeholder route structure (empty route groups for future epics)
-- [ ] Task 7: Implement server entry point (AC: #2, #3)
-  - [ ] Create `src/index.ts` — starts @hono/node-server on configured PORT
-  - [ ] Log server start message with port number via Pino
-- [ ] Task 8: Create shared types (AC: #1)
-  - [ ] Create `src/types.ts` with core types: Bookmark, Tag, ApiError, PaginatedResponse
-- [ ] Task 9: Create project support files (AC: #1)
-  - [ ] Create `.gitignore` (node_modules, dist, data/*.db*, .env)
-  - [ ] Create `.env.example` documenting all env vars with defaults
-  - [ ] Create `vitest.config.ts`
-- [ ] Task 10: Verify dev server starts (AC: #2, #3, #5)
-  - [ ] Run `npm run dev` and confirm Hono server starts on port 3000
-  - [ ] Verify structured JSON log output
+- [x] Task 1: Initialize npm project and install dependencies (AC: #1)
+  - [x] Run `npm init -y` in project root
+  - [x] Install production deps: `hono @hono/node-server better-sqlite3 zod @hono/zod-validator pino pino-http`
+  - [x] Install dev deps: `typescript @types/better-sqlite3 @types/node tsx vitest`
+  - [x] Configure package.json scripts: `dev`, `build`, `start`, `test`
+- [x] Task 2: Configure TypeScript (AC: #1)
+  - [x] Run `npx tsc --init` and configure strict mode
+  - [x] Set `outDir: "dist"`, `rootDir: "src"`, `target: "ES2022"`, `module: "NodeNext"`, `moduleResolution: "NodeNext"`
+  - [x] Enable `declaration`, `strict`, `esModuleInterop`, `skipLibCheck`
+- [x] Task 3: Create project directory structure (AC: #1)
+  - [x] Create `src/routes/`, `src/middleware/`, `src/schemas/`, `src/db/`, `src/db/migrations/`, `src/db/repositories/`, `src/services/`
+  - [x] Create `test/routes/`, `test/db/`, `test/services/`
+  - [x] Create `data/` with `.gitkeep`
+- [x] Task 4: Implement config module (AC: #3, #4, #5)
+  - [x] Create `src/config.ts` reading PORT, DATA_DIR, CORS_ORIGINS, LOG_LEVEL, NODE_ENV from env
+  - [x] Apply defaults: PORT=3000, DATA_DIR=./data, LOG_LEVEL=info, NODE_ENV=development
+  - [x] Parse CORS_ORIGINS as comma-separated string to string array
+- [x] Task 5: Implement logger middleware (AC: #2)
+  - [x] Create `src/middleware/logger-middleware.ts` using Pino + pino-http
+  - [x] Configure Pino with LOG_LEVEL from config, JSON output to stdout
+- [x] Task 6: Implement Hono app factory (AC: #2, #4)
+  - [x] Create `src/app.ts` — Hono app factory exported for testing
+  - [x] Register CORS middleware using `hono/cors` with origins from config
+  - [x] Register logger middleware
+  - [x] Add placeholder route structure (empty route groups for future epics)
+- [x] Task 7: Implement server entry point (AC: #2, #3)
+  - [x] Create `src/index.ts` — starts @hono/node-server on configured PORT
+  - [x] Log server start message with port number via Pino
+- [x] Task 8: Create shared types (AC: #1)
+  - [x] Create `src/types.ts` with core types: Bookmark, Tag, ApiError, PaginatedResponse
+- [x] Task 9: Create project support files (AC: #1)
+  - [x] Create `.gitignore` (node_modules, dist, data/*.db*, .env)
+  - [x] Create `.env.example` documenting all env vars with defaults
+  - [x] Create `vitest.config.ts`
+- [x] Task 10: Verify dev server starts (AC: #2, #3, #5)
+  - [x] Run `npm run dev` and confirm Hono server starts on configured port (validated live on 3457; config default for 3000 covered by tests due host port 3000 collision)
+  - [x] Verify structured JSON log output
 
 ## Dev Notes
 
@@ -227,10 +227,43 @@ personal-bookmarks-api/
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+openai/gpt-5.4
 
 ### Debug Log References
 
+- `npm test`
+- `npm run build`
+- `PORT=3457 timeout 8s npm run dev`
+- `ss -ltnp '( sport = :3000 )'`
+
 ### Completion Notes List
 
+- ✅ AC1: Verified project structure, dependencies, TypeScript config, support files, and shared types.
+- ✅ AC2: Verified Hono + `@hono/node-server` boots and emits structured Pino JSON startup logs.
+- ✅ AC3: Verified custom `PORT` handling with live boot on `3457`; default `3000` remains defined in `src/config.ts`.
+- ✅ AC4: Verified CORS origin parsing and header behavior via `test/app.test.ts`.
+- ✅ AC5: Verified documented config defaults and invalid-env fallback via `test/config.test.ts`.
+- ✅ Added `test/logger-middleware.test.ts` to cover logger level selection, JSON log payload shape, and middleware passthrough.
+- ⚠️ Host environment note: port `3000` is occupied by an unrelated process (`next-server`), so live default-port boot could not bind on this machine.
+
 ### File List
+
+- .env.example
+- .gitignore
+- data/.gitkeep
+- package-lock.json
+- package.json
+- src/app.ts
+- src/config.ts
+- src/index.ts
+- src/middleware/logger-middleware.ts
+- src/types.ts
+- test/app.test.ts
+- test/config.test.ts
+- test/logger-middleware.test.ts
+- tsconfig.json
+- vitest.config.ts
+
+### Change Log
+
+- 2026-03-20: Completed Story 1.1 implementation; validated config defaults/CORS/server boot and added logger test coverage.

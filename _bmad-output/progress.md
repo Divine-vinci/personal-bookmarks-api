@@ -5,17 +5,15 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 2.3 Update Bookmark (code-review running); Story 2.4 Delete Bookmark (ready-for-dev)
+- Current story: Story 2.4 Delete Bookmark (dev-story running); Story 3.1 Full-Text Search with FTS5 (create-story running)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll detected completed dev-story for Story 2.3 and create-story for Story 2.4, then spawned code-review ACP session `agent:claude:acp:6c8f15d5-6412-47e0-9294-bedb13907124` for Story 2.3.
-- Next step: ACP session running — poll cron active
-- next_after_acp: Dev story 2.4: Delete Bookmark — create-story 3.1 parallel
+- Last action: ACP poll found create-story for Story 3.1 completed, but dev-story for Story 2.4 produced no transcript output after >30 minutes; marked dev-story track timed out for heartbeat recovery.
+- Next step: Fallback: start GPT-5.4 for dev-story
+- next_after_acp: Start story 3.1: Full-Text Search with FTS5 — dev+prep parallel
 
-## Active Code Review Session
-- acp_session_key: agent:claude:acp:6c8f15d5-6412-47e0-9294-bedb13907124
-- acp_workflow: code-review
-- acp_status: running
-- acp_started_at: 2026-03-20T14:34:00Z
+## Pipeline State
+- current_dev_story: 2.4 — GPT-5.4 session: agent:main:subagent:01e154a7-e8ef-4991-b418-500deca4e073 (timed_out: no transcript output after >30 minutes)
+- current_prep_story: 3.1 — Claude ACP session: agent:claude:acp:c91b6d19-2f93-49bf-82c8-c6ccd7f4049e (completed)
 
 ## Previous Create Story Session
 - acp_session_key: agent:claude:acp:e416cb9e-870f-4732-ab85-5ed597d2d6f4

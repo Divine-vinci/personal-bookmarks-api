@@ -1,4 +1,4 @@
-import type { CreateBookmarkInput } from '../../schemas/bookmark-schemas.js';
+import type { CreateBookmarkInput, UpdateBookmarkInput } from '../../schemas/bookmark-schemas.js';
 import type { Bookmark, PaginatedResponse } from '../../types.js';
 import { conflict, notFound } from '../../middleware/error-middleware.js';
 import { getDatabase } from '../database.js';
@@ -171,4 +171,57 @@ export const createBookmark = (input: CreateBookmarkInput): Bookmark => {
 
     throw error;
   }
+};
+
+export const updateBookmark = (id: number, input: UpdateBookmarkInput): Bookmark => {
+  const db = getDatabase();
+  const normalizedTags = Array.from(new Set(input.tags ?? []));
+
+  const updateBookmarkTx = db.transaction((bookmarkId: number, bookmarkInput: UpdateBookmarkInput) => {
+    const existingBookmark = db.prepare('SELECT id FROM bookmarks WHERE id = ?').get(bookmarkId) as { id: number } | undefined;
+
+    if (!existingBookmark) {
+      throw notFound('Bookmark not found');
+    }
+
+    const now = new Date().toISOString();
+
+    db.prepare(
+      `UPDATE bookmarks
+       SET url = ?, title = ?, description = ?, updated_at = ?
+       WHERE id = ?`,
+    ).run(
+      bookmarkInput.url,
+      bookmarkInput.title,
+      bookmarkInput.description ?? null,
+      now,
+      bookmarkId,
+    );
+
+    db.prepare('DELETE FROM bookmark_tags WHERE bookmark_id = ?').run(bookmarkId);
+
+    for (const tagName of normalizedTags) {
+      db.prepare('INSERT OR IGNORE INTO tags (name) VALUES (?)').run(tagName);
+      const tagRow = db.prepare('SELECT id, name FROM tags WHERE name = ?').get(tagName) as TagRow | undefined;
+
+      if (!tagRow) {
+        throw new Error(`Failed to resolve tag after upsert: ${tagName}`);
+      }
+
+      db.prepare('INSERT INTO bookmark_tags (bookmark_id, tag_id) VALUES (?, ?)').run(bookmarkId, tagRow.id);
+    }
+  });
+
+  try {
+    updateBookmarkTx(id, input);
+  }
+  catch (error: unknown) {
+    if (isDuplicateUrlError(error)) {
+      throw conflict('A bookmark with this URL already exists');
+    }
+
+    throw error;
+  }
+
+  return getBookmarkById(id);
 };

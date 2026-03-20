@@ -26,6 +26,15 @@ const authorizedGetRequest = (app: ReturnType<typeof createApp>, path: string) =
   },
 });
 
+const authorizedPutRequest = (app: ReturnType<typeof createApp>, path: string, body: unknown) => app.request(path, {
+  method: 'PUT',
+  headers: {
+    authorization: `Bearer ${API_KEY}`,
+    'content-type': 'application/json',
+  },
+  body: JSON.stringify(body),
+});
+
 describe('bookmark routes', () => {
   let manager: DatabaseManager;
 
@@ -602,14 +611,308 @@ describe('bookmark routes', () => {
     expect(body.error.details.some((detail) => detail.field === 'limit')).toBe(true);
   });
 
-  it('returns 422 for negative offset', async () => {
+  it('updates all fields and returns 200 for PUT /:id', async () => {
     const app = createApp();
 
-    const response = await authorizedGetRequest(app, '/api/bookmarks?offset=-1');
+    const createResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/original',
+      title: 'Original',
+      description: 'Original description',
+      tags: ['rust', 'async'],
+    });
+    const created = await createResponse.json() as {
+      id: number;
+      created_at: string;
+      updated_at: string;
+    };
+
+    const response = await authorizedPutRequest(app, `/api/bookmarks/${created.id}`, {
+      url: 'https://example.com/updated',
+      title: 'Updated',
+      description: 'Updated description',
+      tags: ['rust', 'tokio'],
+    });
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      id: created.id,
+      url: 'https://example.com/updated',
+      title: 'Updated',
+      description: 'Updated description',
+      tags: ['rust', 'tokio'],
+      created_at: created.created_at,
+    });
+  });
+
+  it('updates updated_at while preserving created_at for PUT /:id', async () => {
+    const app = createApp();
+
+    const createResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/time-original',
+      title: 'Original time',
+      tags: ['rust'],
+    });
+    const created = await createResponse.json() as {
+      id: number;
+      created_at: string;
+      updated_at: string;
+    };
+
+    const db = getDatabase();
+    db.prepare('UPDATE bookmarks SET created_at = ?, updated_at = ? WHERE id = ?').run(
+      '2026-03-20T10:00:00.000Z',
+      '2026-03-20T10:00:00.000Z',
+      created.id,
+    );
+
+    const response = await authorizedPutRequest(app, `/api/bookmarks/${created.id}`, {
+      url: 'https://example.com/time-updated',
+      title: 'Updated time',
+      description: null,
+      tags: ['tokio'],
+    });
+
+    expect(response.status).toBe(200);
+    const updated = await response.json() as {
+      created_at: string;
+      updated_at: string;
+    };
+
+    expect(updated.created_at).toBe('2026-03-20T10:00:00.000Z');
+    expect(updated.updated_at).not.toBe('2026-03-20T10:00:00.000Z');
+    expect(new Date(updated.updated_at).getTime()).toBeGreaterThan(new Date(updated.created_at).getTime());
+  });
+
+  it('reassigns tags by removing old tags and keeping shared tags for PUT /:id', async () => {
+    const app = createApp();
+
+    const createResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/tag-reassign',
+      title: 'Tag reassign',
+      tags: ['rust', 'async'],
+    });
+    const created = await createResponse.json() as { id: number };
+
+    const response = await authorizedPutRequest(app, `/api/bookmarks/${created.id}`, {
+      url: 'https://example.com/tag-reassign',
+      title: 'Tag reassign updated',
+      description: null,
+      tags: ['rust', 'tokio'],
+    });
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      tags: ['rust', 'tokio'],
+    });
+
+    const db = getDatabase();
+    const tagNames = db.prepare(
+      `SELECT t.name
+       FROM tags t
+       INNER JOIN bookmark_tags bt ON bt.tag_id = t.id
+       WHERE bt.bookmark_id = ?
+       ORDER BY t.name ASC`,
+    ).all(created.id) as Array<{ name: string }> ;
+
+    expect(tagNames.map((row) => row.name)).toEqual(['rust', 'tokio']);
+    const asyncAssociations = db.prepare(
+      `SELECT COUNT(*) as count
+       FROM bookmark_tags bt
+       INNER JOIN tags t ON t.id = bt.tag_id
+       WHERE bt.bookmark_id = ? AND t.name = ?`,
+    ).get(created.id, 'async') as { count: number };
+    expect(asyncAssociations.count).toBe(0);
+  });
+
+  it('removes all tag associations when tags is empty for PUT /:id', async () => {
+    const app = createApp();
+
+    const createResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/remove-tags',
+      title: 'Remove tags',
+      tags: ['rust', 'async'],
+    });
+    const created = await createResponse.json() as { id: number };
+
+    const response = await authorizedPutRequest(app, `/api/bookmarks/${created.id}`, {
+      url: 'https://example.com/remove-tags',
+      title: 'Remove tags updated',
+      description: null,
+      tags: [],
+    });
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      tags: [],
+    });
+
+    const db = getDatabase();
+    const associationCount = db.prepare('SELECT COUNT(*) as count FROM bookmark_tags WHERE bookmark_id = ?').get(created.id) as { count: number };
+    expect(associationCount.count).toBe(0);
+  });
+
+  it('allows changing URL to an unused URL for PUT /:id', async () => {
+    const app = createApp();
+
+    const createResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/url-change-original',
+      title: 'Original URL',
+    });
+    const created = await createResponse.json() as { id: number };
+
+    const response = await authorizedPutRequest(app, `/api/bookmarks/${created.id}`, {
+      url: 'https://example.com/url-change-updated',
+      title: 'Updated URL',
+      description: null,
+      tags: [],
+    });
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      url: 'https://example.com/url-change-updated',
+    });
+  });
+
+  it('returns duplicate_url when PUT /:id uses another bookmark URL', async () => {
+    const app = createApp();
+
+    const firstResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/put-duplicate-first',
+      title: 'First bookmark',
+    });
+    const secondResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/put-duplicate-second',
+      title: 'Second bookmark',
+    });
+    const secondBookmark = await secondResponse.json() as { id: number };
+    await firstResponse.json();
+
+    const response = await authorizedPutRequest(app, `/api/bookmarks/${secondBookmark.id}`, {
+      url: 'https://example.com/put-duplicate-first',
+      title: 'Second updated',
+      description: null,
+      tags: [],
+    });
+
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        code: 'duplicate_url',
+        message: 'A bookmark with this URL already exists',
+      },
+    });
+  });
+
+  it('allows PUT /:id to keep the same URL without self-conflict', async () => {
+    const app = createApp();
+
+    const createResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/self-conflict',
+      title: 'Self conflict',
+      tags: ['rust'],
+    });
+    const created = await createResponse.json() as { id: number };
+
+    const response = await authorizedPutRequest(app, `/api/bookmarks/${created.id}`, {
+      url: 'https://example.com/self-conflict',
+      title: 'Self conflict updated',
+      description: 'Still same URL',
+      tags: ['rust', 'tokio'],
+    });
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      id: created.id,
+      url: 'https://example.com/self-conflict',
+      title: 'Self conflict updated',
+      description: 'Still same URL',
+      tags: ['rust', 'tokio'],
+    });
+  });
+
+  it('returns 404 for a non-existent bookmark ID on PUT /:id', async () => {
+    const app = createApp();
+
+    const response = await authorizedPutRequest(app, '/api/bookmarks/999', {
+      url: 'https://example.com/missing-bookmark',
+      title: 'Missing bookmark',
+      description: null,
+      tags: [],
+    });
+
+    expect(response.status).toBe(404);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        code: 'not_found',
+        message: 'Bookmark not found',
+      },
+    });
+  });
+
+  it('returns validation_error when required fields are missing for PUT /:id', async () => {
+    const app = createApp();
+
+    const createResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/put-missing-fields',
+      title: 'Missing fields seed',
+    });
+    const created = await createResponse.json() as { id: number };
+
+    const response = await authorizedPutRequest(app, `/api/bookmarks/${created.id}`, {
+      title: 'Only title',
+    });
 
     expect(response.status).toBe(422);
     const body = await response.json() as { error: { code: string; details: Array<{ field: string }> } };
     expect(body.error.code).toBe('validation_error');
-    expect(body.error.details.some((detail) => detail.field === 'offset')).toBe(true);
+    expect(body.error.details.some((detail) => detail.field === 'url')).toBe(true);
+  });
+
+  it('returns invalid_url for invalid URL format on PUT /:id', async () => {
+    const app = createApp();
+
+    const createResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/put-invalid-url',
+      title: 'Invalid URL seed',
+    });
+    const created = await createResponse.json() as { id: number };
+
+    const response = await authorizedPutRequest(app, `/api/bookmarks/${created.id}`, {
+      url: 'not-a-url',
+      title: 'Invalid URL update',
+      description: null,
+      tags: [],
+    });
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        code: 'invalid_url',
+        message: 'Invalid url: must be a valid URL',
+      },
+    });
+  });
+
+  it('returns 401 for unauthenticated PUT requests', async () => {
+    const app = createApp();
+
+    const createResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/put-unauthorized',
+      title: 'Unauthorized seed',
+    });
+    const created = await createResponse.json() as { id: number };
+
+    const response = await app.request(`/api/bookmarks/${created.id}`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        url: 'https://example.com/put-unauthorized-updated',
+        title: 'Unauthorized update',
+        description: null,
+        tags: [],
+      }),
+    });
+
+    expect(response.status).toBe(401);
   });
 });

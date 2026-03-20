@@ -1,6 +1,6 @@
 # Story 2.3: Update Bookmark
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -22,37 +22,37 @@ So that I can correct or modify saved bookmarks.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Add `updateBookmark` to bookmark repository (AC: #1, #2, #3, #4, #5)
-  - [ ] Implement `updateBookmark(id: number, input: UpdateBookmarkInput): Bookmark` in `src/db/repositories/bookmark-repository.ts`
-  - [ ] Check bookmark exists first — throw `notFound()` if not
-  - [ ] UPDATE bookmarks SET url, title, description, updated_at WHERE id = ?
-  - [ ] DELETE all existing bookmark_tags for this bookmark_id
-  - [ ] Re-insert tags using same upsert pattern as `createBookmark`
-  - [ ] Wrap in transaction (same pattern as `createBookmark`)
-  - [ ] Catch UNIQUE constraint on url → throw `conflict()` (same as create)
-  - [ ] Return updated bookmark via `getBookmarkById(id)`
+- [x] Task 1: Add `updateBookmark` to bookmark repository (AC: #1, #2, #3, #4, #5)
+  - [x] Implement `updateBookmark(id: number, input: UpdateBookmarkInput): Bookmark` in `src/db/repositories/bookmark-repository.ts`
+  - [x] Check bookmark exists first — throw `notFound()` if not
+  - [x] UPDATE bookmarks SET url, title, description, updated_at WHERE id = ?
+  - [x] DELETE all existing bookmark_tags for this bookmark_id
+  - [x] Re-insert tags using same upsert pattern as `createBookmark`
+  - [x] Wrap in transaction (same pattern as `createBookmark`)
+  - [x] Catch UNIQUE constraint on url → throw `conflict()` (same as create)
+  - [x] Return updated bookmark via `getBookmarkById(id)`
 
-- [ ] Task 2: Add PUT /:id route handler (AC: #1, #4, #5)
-  - [ ] Add `PUT /:id` handler in `src/routes/bookmark-routes.ts`
-  - [ ] Validate `:id` param with `zValidator('param', idParamSchema)`
-  - [ ] Validate body with `zValidator('json', updateBookmarkSchema)`
-  - [ ] Call `updateBookmark(id, input)`
-  - [ ] Return 200 with updated bookmark object
+- [x] Task 2: Add PUT /:id route handler (AC: #1, #4, #5)
+  - [x] Add `PUT /:id` handler in `src/routes/bookmark-routes.ts`
+  - [x] Validate `:id` param with `zValidator('param', idParamSchema)`
+  - [x] Validate body with `zValidator('json', updateBookmarkSchema)`
+  - [x] Call `updateBookmark(id, input)`
+  - [x] Return 200 with updated bookmark object
 
-- [ ] Task 3: Write tests (AC: #1-#5)
-  - [ ] Add test cases to existing `test/routes/bookmark-routes.test.ts`
-  - [ ] PUT /:id — 200 with fully updated bookmark object
-  - [ ] PUT /:id — updated_at changes, created_at preserved
-  - [ ] PUT /:id — tag reassignment (old removed, new added, shared kept)
-  - [ ] PUT /:id — empty tags array removes all tag associations
-  - [ ] PUT /:id — URL changed to unused URL succeeds
-  - [ ] PUT /:id — URL changed to another bookmark's URL returns 409 `duplicate_url`
-  - [ ] PUT /:id — same URL (unchanged) succeeds (no self-conflict)
-  - [ ] PUT /:id — non-existent ID returns 404 `not_found`
-  - [ ] PUT /:id — missing required fields returns 422 validation error
-  - [ ] PUT /:id — invalid URL returns 400 `invalid_url`
-  - [ ] PUT /:id — 401 without auth
-  - [ ] All existing tests must still pass
+- [x] Task 3: Write tests (AC: #1-#5)
+  - [x] Add test cases to existing `test/routes/bookmark-routes.test.ts`
+  - [x] PUT /:id — 200 with fully updated bookmark object
+  - [x] PUT /:id — updated_at changes, created_at preserved
+  - [x] PUT /:id — tag reassignment (old removed, new added, shared kept)
+  - [x] PUT /:id — empty tags array removes all tag associations
+  - [x] PUT /:id — URL changed to unused URL succeeds
+  - [x] PUT /:id — URL changed to another bookmark's URL returns 409 `duplicate_url`
+  - [x] PUT /:id — same URL (unchanged) succeeds (no self-conflict)
+  - [x] PUT /:id — non-existent ID returns 404 `not_found`
+  - [x] PUT /:id — missing required fields returns 422 validation error
+  - [x] PUT /:id — invalid URL returns 400 `invalid_url`
+  - [x] PUT /:id — 401 without auth
+  - [x] All existing tests must still pass
 
 ## Dev Notes
 
@@ -250,8 +250,28 @@ describe('PUT /api/bookmarks/:id', () => {
 
 ### Agent Model Used
 
+- openai/gpt-5.4
+
 ### Debug Log References
+
+- Red: `npm test -- test/routes/bookmark-routes.test.ts` (failed: missing `PUT /api/bookmarks/:id` route, 10 new PUT tests red)
+- Green: `npm test -- test/routes/bookmark-routes.test.ts` (40/40 passed)
+- Regression: `npm test` (103/103 passed)
+- Build: `npm run build`
 
 ### Completion Notes List
 
+- Implemented `updateBookmark(id, input)` in `src/db/repositories/bookmark-repository.ts` with transaction-wrapped full-replace updates, duplicate URL conflict handling, delete-then-reinsert tag reassignment, and `getBookmarkById(id)` return semantics.
+- Added `PUT /:id` in `src/routes/bookmark-routes.ts` with `idParamSchema` + `updateBookmarkSchema` validation and repository integration.
+- Added PUT route coverage in `test/routes/bookmark-routes.test.ts` for AC1-AC5: full update success, timestamp preservation/update, tag reassignment, empty tags, unused URL change, duplicate URL conflict, same-URL self-update, missing bookmark 404, validation 422, invalid URL 400, unauthenticated 401.
+- Verified full regression suite and build after implementation.
+
 ### File List
+
+- src/db/repositories/bookmark-repository.ts
+- src/routes/bookmark-routes.ts
+- test/routes/bookmark-routes.test.ts
+
+## Change Log
+
+- 2026-03-20: Implemented Story 2.3 update bookmark repository + route + tests; validated with full test suite and build.

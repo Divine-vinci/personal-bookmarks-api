@@ -5,17 +5,29 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 2.2 Get and List Bookmarks (code-review running); Story 2.3 Update Bookmark (ready for dev)
+- Current story: Story 2.3 Update Bookmark (code-review running); Story 2.4 Delete Bookmark (ready-for-dev)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: ACP poll detected both completed tracks for Story 2.2 dev and Story 2.3 prep, committed/pushed changes as `d2db0b9`, and spawned code-review ACP session `agent:claude:acp:f17cd8ad-11b7-4f92-ba18-6bc9afd9a180` for Story 2.2.
-- Next step: Poll ACP session agent:claude:acp:f17cd8ad-11b7-4f92-ba18-6bc9afd9a180 for code-review completion
-- next_after_acp: Start story 2.3: Update Bookmark — dev+prep parallel
+- Last action: ACP poll detected completed dev-story for Story 2.3 and create-story for Story 2.4, then spawned code-review ACP session `agent:claude:acp:6c8f15d5-6412-47e0-9294-bedb13907124` for Story 2.3.
+- Next step: ACP session running — poll cron active
+- next_after_acp: Start story 2.4: Delete Bookmark — dev+prep parallel
 
 ## Active Code Review Session
-- acp_session_key: agent:claude:acp:f17cd8ad-11b7-4f92-ba18-6bc9afd9a180
+- acp_session_key: agent:claude:acp:6c8f15d5-6412-47e0-9294-bedb13907124
 - acp_workflow: code-review
 - acp_status: running
-- acp_started_at: 2026-03-20T14:14:00Z
+- acp_started_at: 2026-03-20T14:34:00Z
+
+## Previous Create Story Session
+- acp_session_key: agent:claude:acp:e416cb9e-870f-4732-ab85-5ed597d2d6f4
+- acp_workflow: create-story
+- acp_status: completed (paired with Story 2.3 dev completion during ACP poll on 2026-03-20)
+- acp_started_at: 2026-03-20T14:24:00Z
+
+## Previous Dev Session
+- subagent_session_key: agent:main:subagent:32cef1c2-f588-42fa-be55-9232ab9c2e3b
+- subagent_workflow: dev-story
+- subagent_status: completed
+- subagent_started_at: 2026-03-20T14:24:00Z
 
 ## Previous Create Story Session
 - acp_session_key: agent:claude:acp:697d797a-9932-41c1-85f4-2b3c54a755bc
@@ -83,8 +95,8 @@
 - [x] Story 1.4: Health Check Endpoint (commit: ff1d3a6)
 - [x] Story 1.5: Error Handling and Input Validation Framework (commit: cc441d3)
 - [x] Story 2.1: Create Bookmark (commit: 0b6aab1)
-- [ ] Story 2.2: Get and List Bookmarks (in progress via dev-story)
-- [ ] Story 2.3: Update Bookmark
+- [x] Story 2.2: Get and List Bookmarks (commit: 92ab074)
+- [ ] Story 2.3: Update Bookmark (in code-review)
 - [ ] Story 2.4: Delete Bookmark
 - [ ] Story 3.1: Full-Text Search with FTS5
 - [ ] Story 3.2: Tag Filtering
@@ -136,6 +148,11 @@
 - [x] code-review — Story 2.1
 - [x] Story 2.1 loop complete (commit: 0b6aab1)
 - [x] create-story — Story 2.2
+- [x] dev-story — Story 2.2
+- [x] code-review — Story 2.2 (commit: 92ab074)
+- [x] Story 2.2 loop complete (commit: 92ab074)
+- [x] create-story — Story 2.3
+- [x] dev-story — Story 2.3
 
 ## Blockers
 - None

@@ -1,6 +1,6 @@
 # Story 1.1: Initialize Project and Development Environment
 
-Status: review
+Status: done
 
 ## Story
 
@@ -267,3 +267,33 @@ openai/gpt-5.4
 ### Change Log
 
 - 2026-03-20: Completed Story 1.1 implementation; validated config defaults/CORS/server boot and added logger test coverage.
+- 2026-03-20: Code review (Amelia/claude-opus-4-6) — 6 issues fixed, 3 LOW deferred.
+
+## Senior Developer Review (AI)
+
+**Reviewer:** Amelia (claude-opus-4-6) on 2026-03-20
+
+### Findings Summary
+
+**Issues Found:** 2 High, 4 Medium, 3 Low
+**Issues Fixed:** 6 (all High + Medium)
+**Action Items:** 0
+
+### Fixed Issues
+
+1. **[HIGH] `src/middleware/logger-middleware.ts` — CJS require hack replaced with proper ESM import.** Used `createRequire` + unsafe cast for pino-http. Replaced with `import { pinoHttp } from 'pino-http'` — type-safe, standard ESM.
+2. **[HIGH] `test/logger-middleware.test.ts` — Added test for middleware with HTTP bindings present.** Core middleware path (pino-http invocation) was untested. Added test with mock IncomingMessage/ServerResponse verifying next() is called.
+3. **[MEDIUM] `src/config.ts` — Added port upper bound validation (<=65535).** Previously accepted any positive integer. Now rejects ports > 65535.
+4. **[MEDIUM] `src/middleware/logger-middleware.ts` — Fixed duplicate logger instances.** `createHttpLogger` created a separate Pino logger. Now receives parent logger as argument, ensuring HTTP and app logs share the same instance.
+5. **[MEDIUM] `test/app.test.ts` — Added CORS rejection test.** Verifies non-configured origins do not receive CORS headers.
+6. **[MEDIUM] `test/config.test.ts` — Added port edge case tests.** Tests for PORT=0, -1, 65535, 65536, and empty string.
+
+### Deferred Issues (LOW)
+
+- Empty placeholder routes in `src/app.ts` — harmless, will be populated in later stories.
+- No graceful shutdown in `src/index.ts` — Docker concern deferred to Story 5.1.
+- No test coverage for `src/index.ts` entry point — low risk, integration-level concern.
+
+### Verdict: APPROVED
+
+All ACs implemented. All tests pass (11/11). Build succeeds. Code quality issues resolved.

@@ -65,6 +65,8 @@ describe('loggerMiddleware', () => {
       setHeader: vi.fn(),
       getHeader: vi.fn(),
       end: vi.fn(),
+      on: vi.fn(),
+      removeListener: vi.fn(),
     };
 
     await middleware(

@@ -5,38 +5,27 @@
 
 ## Current State
 - Phase: 4
-- Current story: Story 1.3 API Key Authentication (fallback implementation subagent running)
+- Current story: Story 1.3 API Key Authentication (code-review running)
 - Working directory: /home/clawd/projects/personal-bookmarks-api
-- Last action: stale no-op `dev-story` finalization detected; started fallback implementation subagent `agent:main:subagent:bde27395-24a7-4d22-8439-8113e6c36922` to actually implement Story 1.3.
-- Next step: Poll subagent session agent:main:subagent:bde27395-24a7-4d22-8439-8113e6c36922 for Story 1.3 implementation completion, then start `code-review` for Story 1.3 API Key Authentication.
+- Last action: Story 1.3 implemented, verified (`npm test`, `npm run build`), committed/pushed as `466cdc7`, and `code-review` started via ACP session `agent:claude:acp:e64e8f9c-e5ca-4c34-9254-a0faa92594dd`.
+- Next step: Poll ACP session agent:claude:acp:e64e8f9c-e5ca-4c34-9254-a0faa92594dd for `code-review` completion, then commit review fixes if any and mark Story 1.3 done.
 
-## Active Create Story Session
+## Active Code Review Session
+- acp_session_key: agent:claude:acp:e64e8f9c-e5ca-4c34-9254-a0faa92594dd
+- acp_workflow: code-review
+- acp_status: running
+- acp_started_at: 2026-03-20T09:07:00Z
+
+## Previous Create Story Session
 - acp_session_key: agent:claude:acp:96c9ed44-5518-4ebf-931d-ec7b12f89d8e
 - acp_workflow: create-story
 - acp_status: completed
 - acp_started_at: 2026-03-20T08:33:00Z
 
-## Active Dev Session
+## Previous Dev Session
 - subagent_session_key: agent:main:subagent:bde27395-24a7-4d22-8439-8113e6c36922
 - subagent_workflow: dev-story-fallback
-- subagent_status: running
-
-## Previous Dev Session
-- subagent_session_key: agent:main:subagent:e1be097e-d1b0-4b84-8539-396020fe95a7
-- subagent_workflow: dev-story
-- subagent_status: completed (no-op finalization only)
-
-## Previous Dev Session
-- subagent_session_key: agent:main:subagent:065c79e5-014a-4969-9803-3b3a220a8f36
-- subagent_workflow: dev-story
 - subagent_status: completed
-- subagent_started_at: 2026-03-20T07:33:00Z
-
-## Previous Code Review Session
-- acp_session_key: agent:claude:acp:5f2c9154-3956-490d-aa05-55200610a95b
-- acp_workflow: code-review
-- acp_status: completed
-- acp_started_at: 2026-03-20T08:00:00Z
 
 ## Stories (populated after sprint-planning from sprint-status.yaml)
 - [x] Story 1.1: Initialize Project and Development Environment (commit: 3a09389)
@@ -70,6 +59,7 @@
 - [x] code-review — Story 1.2 (commit: be853ae)
 - [x] Story 1.2 loop complete (commit: be853ae)
 - [x] create-story — Story 1.3 (commit: 0b5b8f5)
+- [x] dev-story — Story 1.3 (commit: 466cdc7)
 
 ## Blockers
 - None

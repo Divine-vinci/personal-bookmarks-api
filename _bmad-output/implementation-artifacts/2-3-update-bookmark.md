@@ -1,6 +1,6 @@
 # Story 2.3: Update Bookmark
 
-Status: review
+Status: done
 
 ## Story
 
@@ -275,3 +275,4 @@ describe('PUT /api/bookmarks/:id', () => {
 ## Change Log
 
 - 2026-03-20: Implemented Story 2.3 update bookmark repository + route + tests; validated with full test suite and build.
+- 2026-03-20: Code review fixes — restored deleted "returns 422 for negative offset" test (regression from Story 2.2), cached prepared statements in `updateBookmark` loop, added missing test for PUT with tags omitted, removed unused `firstResponse.json()` call, fixed trailing whitespace.

@@ -3,19 +3,7 @@
   "projectPath": "/home/clawd/projects/personal-bookmarks-api",
   "createdAt": "2026-03-20T01:30:49.520Z",
   "currentPhase": "implementation",
-  "activeWorkflows": [
-    {
-      "id": "code-review",
-      "agentId": "dev",
-      "agentName": "Amelia",
-      "mode": "yolo",
-      "currentStep": 1,
-      "totalSteps": null,
-      "currentStepFile": "/home/clawd/.openclaw/extensions/bmad-method/bmad-method/bmm/workflows/4-implementation/code-review/workflow.yaml",
-      "outputFile": "",
-      "startedAt": "2026-03-20T14:34:21.847Z"
-    }
-  ],
+  "activeWorkflows": [],
   "completedWorkflows": [
     {
       "id": "create-product-brief",
@@ -194,6 +182,12 @@
       "agentId": "sm",
       "outputFile": "",
       "completedAt": "2026-03-20T14:34:12.426Z"
+    },
+    {
+      "id": "code-review",
+      "agentId": "dev",
+      "outputFile": "",
+      "completedAt": "2026-03-20T14:44:18.253Z"
     }
   ]
 }

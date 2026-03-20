@@ -712,7 +712,7 @@ describe('bookmark routes', () => {
        INNER JOIN bookmark_tags bt ON bt.tag_id = t.id
        WHERE bt.bookmark_id = ?
        ORDER BY t.name ASC`,
-    ).all(created.id) as Array<{ name: string }> ;
+    ).all(created.id) as Array<{ name: string }>;
 
     expect(tagNames.map((row) => row.name)).toEqual(['rust', 'tokio']);
     const asyncAssociations = db.prepare(
@@ -785,7 +785,6 @@ describe('bookmark routes', () => {
       title: 'Second bookmark',
     });
     const secondBookmark = await secondResponse.json() as { id: number };
-    await firstResponse.json();
 
     const response = await authorizedPutRequest(app, `/api/bookmarks/${secondBookmark.id}`, {
       url: 'https://example.com/put-duplicate-first',
@@ -914,5 +913,37 @@ describe('bookmark routes', () => {
     });
 
     expect(response.status).toBe(401);
+  });
+
+  it('returns 422 for negative offset', async () => {
+    const app = createApp();
+
+    const response = await authorizedGetRequest(app, '/api/bookmarks?offset=-1');
+
+    expect(response.status).toBe(422);
+    const body = await response.json() as { error: { code: string; details: Array<{ field: string }> } };
+    expect(body.error.code).toBe('validation_error');
+    expect(body.error.details.some((detail) => detail.field === 'offset')).toBe(true);
+  });
+
+  it('removes all tags when tags field is omitted in PUT /:id', async () => {
+    const app = createApp();
+
+    const createResponse = await authorizedJsonRequest(app, {
+      url: 'https://example.com/omit-tags-put',
+      title: 'Omit tags',
+      tags: ['rust', 'async'],
+    });
+    const created = await createResponse.json() as { id: number };
+
+    const response = await authorizedPutRequest(app, `/api/bookmarks/${created.id}`, {
+      url: 'https://example.com/omit-tags-put',
+      title: 'Omit tags updated',
+    });
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      tags: [],
+    });
   });
 });

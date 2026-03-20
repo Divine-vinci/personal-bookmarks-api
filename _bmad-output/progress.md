@@ -9,7 +9,7 @@
 - Working directory: /home/clawd/projects/personal-bookmarks-api
 - Last action: ACP poll detected completed dev-story for Story 2.3 and create-story for Story 2.4, then spawned code-review ACP session `agent:claude:acp:6c8f15d5-6412-47e0-9294-bedb13907124` for Story 2.3.
 - Next step: ACP session running — poll cron active
-- next_after_acp: Start story 2.4: Delete Bookmark — dev+prep parallel
+- next_after_acp: Dev story 2.4: Delete Bookmark — create-story 3.1 parallel
 
 ## Active Code Review Session
 - acp_session_key: agent:claude:acp:6c8f15d5-6412-47e0-9294-bedb13907124

@@ -177,8 +177,19 @@ export const updateBookmark = (id: number, input: UpdateBookmarkInput): Bookmark
   const db = getDatabase();
   const normalizedTags = Array.from(new Set(input.tags ?? []));
 
+  const selectExisting = db.prepare('SELECT id FROM bookmarks WHERE id = ?');
+  const updateStmt = db.prepare(
+    `UPDATE bookmarks
+     SET url = ?, title = ?, description = ?, updated_at = ?
+     WHERE id = ?`,
+  );
+  const deleteTagAssociations = db.prepare('DELETE FROM bookmark_tags WHERE bookmark_id = ?');
+  const insertTag = db.prepare('INSERT OR IGNORE INTO tags (name) VALUES (?)');
+  const selectTag = db.prepare('SELECT id, name FROM tags WHERE name = ?');
+  const insertBookmarkTag = db.prepare('INSERT INTO bookmark_tags (bookmark_id, tag_id) VALUES (?, ?)');
+
   const updateBookmarkTx = db.transaction((bookmarkId: number, bookmarkInput: UpdateBookmarkInput) => {
-    const existingBookmark = db.prepare('SELECT id FROM bookmarks WHERE id = ?').get(bookmarkId) as { id: number } | undefined;
+    const existingBookmark = selectExisting.get(bookmarkId) as { id: number } | undefined;
 
     if (!existingBookmark) {
       throw notFound('Bookmark not found');
@@ -186,11 +197,7 @@ export const updateBookmark = (id: number, input: UpdateBookmarkInput): Bookmark
 
     const now = new Date().toISOString();
 
-    db.prepare(
-      `UPDATE bookmarks
-       SET url = ?, title = ?, description = ?, updated_at = ?
-       WHERE id = ?`,
-    ).run(
+    updateStmt.run(
       bookmarkInput.url,
       bookmarkInput.title,
       bookmarkInput.description ?? null,
@@ -198,17 +205,17 @@ export const updateBookmark = (id: number, input: UpdateBookmarkInput): Bookmark
       bookmarkId,
     );
 
-    db.prepare('DELETE FROM bookmark_tags WHERE bookmark_id = ?').run(bookmarkId);
+    deleteTagAssociations.run(bookmarkId);
 
     for (const tagName of normalizedTags) {
-      db.prepare('INSERT OR IGNORE INTO tags (name) VALUES (?)').run(tagName);
-      const tagRow = db.prepare('SELECT id, name FROM tags WHERE name = ?').get(tagName) as TagRow | undefined;
+      insertTag.run(tagName);
+      const tagRow = selectTag.get(tagName) as TagRow | undefined;
 
       if (!tagRow) {
         throw new Error(`Failed to resolve tag after upsert: ${tagName}`);
       }
 
-      db.prepare('INSERT INTO bookmark_tags (bookmark_id, tag_id) VALUES (?, ?)').run(bookmarkId, tagRow.id);
+      insertBookmarkTag.run(bookmarkId, tagRow.id);
     }
   });
 
